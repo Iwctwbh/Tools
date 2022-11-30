@@ -33,7 +33,12 @@
           </el-icon>
         </el-tooltip>
         <div style="flex: 1"></div>
-        <el-button type="primary" :loading=IsLoading>
+        <el-button
+            :disabled="checkbox1"
+            :loading=IsLoading
+            type="primary"
+            @click="btnLogFilter()"
+        >
           过滤
         </el-button>
       </div>
@@ -54,48 +59,46 @@
 </style>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue'
+import {ref, watch} from 'vue'
 
 let regex_string = new RegExp('');
-const string_regex_empty: String = new RegExp('').toString();
-
 let array_textareain: any[] = [];
 
 const textareain = ref('');
 const textregex = ref('');
-const checkbox1 = ref(true);
+const checkbox1 = ref(false);
 const IsLoading = ref(false);
+const textareaout = ref('');
 
-watch(textregex, () => {
+watch([textareain, checkbox1, textregex], () => {
   regex_string = new RegExp(textregex.value);
-})
-
-async function arraySplit(){
-  array_textareain = textareain.value
-      .split('\n');
-}
-
-watch(textareain, () => {
-  IsLoading.value = true;
-  arraySplit();
-  IsLoading.value = false;
-})
-
-const textareaout = computed({
-  get() {
-    if (checkbox1.value) {
-      if (textregex.value !== '' && textareain.value !== '') {
-        return array_textareain
-            .map(s => regex_string.test(s) ? s : null)
-            //.map(s => s.includes(textregex.value) ? s : null)
-            .filter(f => f != null)
-            .join('\n');
-      } else {
-        return textareain.value;
-      }
-    }
-  },
-  set(value) {
+  if (checkbox1.value) {
+    LogFilter();
   }
 })
+
+const btnLogFilter = () => {
+  new Promise<void>((resolve) => {
+    IsLoading.value = true;
+    setTimeout(() => {
+      resolve()
+    }, 50);
+  }).then(() => {
+    LogFilter();
+  })
+}
+
+const LogFilter = () => {
+  if (textregex.value !== '' && textareain.value !== '') {
+    textareaout.value = textareain.value
+        .split('\n')
+        .map(s => regex_string.test(s) ? s : null)
+        //.map(s => s.includes(textregex.value) ? s : null)
+        .filter(f => f != null)
+        .join('\n');
+  } else {
+    textareaout.value = textareain.value;
+  }
+  IsLoading.value = false;
+}
 </script>
