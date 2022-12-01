@@ -14,7 +14,6 @@
       <div class="block">
         <div class="demo-range">
           <el-time-picker
-              v-if="timepicker"
               v-model="timepicker"
               :disabled-hours="disabledHours"
               :disabled-minutes="disabledMinutes"
@@ -91,6 +90,9 @@ import _ from "lodash";
 // Init
 let regex_string = new RegExp('');
 let array_textareain: string[] = [];
+let array_disabledHours: number[] = [];
+let array_disabledMinutes: number[] = [];
+let array_disabledSeconds: number[] = [];
 
 const textareain = ref('');
 const textregex = ref('');
@@ -99,10 +101,6 @@ const IsLoading = ref(false);
 const textareaout = ref('');
 const datepicker = ref('')
 const timepicker = ref<[Date, Date]>()
-const disabledHours = ref(() => {
-  let array: number[] = [];
-  return array;
-});
 
 let defaultTime1: [Date, Date] = [
   new Date(2000, 1, 1, 12, 0, 0),
@@ -132,9 +130,13 @@ const LogFilterForBtn = () => {
 
 const LogFilter = () => {
   if (textregex.value !== '' && textareain.value !== '') {
+    // filter date
+    let [string_start, string_end] = timepicker.value ?? [null, null];
+    let [date_start, date_end] = [moment(string_start), moment(string_end)];
+    array_textareain = array_textareain.filter(f => moment(GetTime(f)) > date_start && moment(GetTime(f)) < date_end);
     textareaout.value = array_textareain.map(s => regex_string.test(s) ? s : null)
         //.map(s => s.includes(textregex.value) ? s : null)
-        .filter(f => f != null)
+        .filter(f => f !== null)
         .join('\n');
   } else {
     textareaout.value = textareain.value;
@@ -144,7 +146,7 @@ const LogFilter = () => {
 
 const MappingData = () => {
   array_textareain = textareain.value
-      .split('\n');
+      .split('\n').filter(f => f !== "");
 
   // Date
   if (array_textareain.length > 0) {
@@ -156,9 +158,9 @@ const MappingData = () => {
       new Date(2000, 1, 1, date_start.hour(), date_start.minute(), date_start.second()),
       new Date(2000, 1, 1, date_end.hour(), date_end.minute(), date_end.second()),
     ];
-    disabledHours.value = () => {
-      return makeRange(0, date_start.hour() - 1).concat(makeRange(date_end.hour() + 1, 23));
-    }
+    array_disabledHours = makeRange(0, date_start.hour() - 1).concat(makeRange(date_end.hour() + 1, 23));
+    array_disabledMinutes = makeRange(0, date_start.minute() - 1).concat(makeRange(date_end.minute() + 1, 59));
+    array_disabledSeconds = makeRange(0, date_start.second() - 1).concat(makeRange(date_end.second() + 1, 59));
   } else {
 
   }
@@ -184,17 +186,16 @@ const makeRange = (start: number, end: number) => {
   return result
 }
 
-// let disabledHours = () => {
-//   let array_number: number[] = [];
-//   return array_number;
-// }
+const disabledHours = () => {
+  return array_disabledHours;
+};
 
-const disabledMinutes = (hour: number) => {
-  return [];
+const disabledMinutes = () => {
+  return array_disabledMinutes;
 }
 
-const disabledSeconds = (start: number, end: number) => {
-  return [];
+const disabledSeconds = () => {
+  return array_disabledSeconds;
 }
 </script>
 
