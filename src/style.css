@@ -2,3 +2,7 @@
     max-width: 90%;
     margin: 0 auto;
 }
+
+#app .el-date-editor.el-input, #app .el-date-editor.el-input__wrapper {
+    width: auto;
+}
