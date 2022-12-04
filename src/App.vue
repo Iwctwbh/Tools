@@ -29,7 +29,7 @@
             v-if="datepicker"
             v-model="datepicker"
             :default-time="defaultTime1"
-            :disabled="textareain == ''"
+            :disabled="textareain === ''"
             end-placeholder="End Date"
             start-placeholder="Start Date"
             type="datetimerange"
@@ -134,9 +134,9 @@ const LogFilterForBtn = () => {
 };
 
 const LogFilter = () => {
-  if (textregex.value !== '' && textareain.value !== '') {
+  let [string_start, string_end] = timepicker.value ?? [null, null];
+  if (textareain.value !== '' && ((moment(string_start).isValid() && moment(string_end).isValid()) || textregex.value !== '')) {
     // filter date
-    let [string_start, string_end] = timepicker.value ?? [null, null];
     let [date_start, date_end] = [moment(string_start), moment(string_end)];
     textareaout.value = array_textareain.filter(f => CompareTime(moment(GetTime(f)), date_start) >= 0
         && CompareTime(moment(GetTime(f)), date_end) <= 0)
