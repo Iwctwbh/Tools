@@ -66,7 +66,7 @@
             :disabled="checkbox1"
             :loading=IsLoading
             type="primary"
-            @click="LogFilterForBtn()"
+            @click="LogFilterForBtn"
         >
           过滤
         </el-button>
@@ -131,7 +131,7 @@ watch([textareain, checkbox1, textregex], () => {
 });
 
 // Function
-const LogFilterForBtn = () => {
+const LogFilterForBtn = ref(() => {
   new Promise<void>((resolve) => {
     IsLoading.value = true;
     setTimeout(() => {
@@ -140,13 +140,17 @@ const LogFilterForBtn = () => {
   }).then(() => {
     LogFilter();
   })
-};
+}); // 过滤
 
 const LogFilter = () => {
   let [string_start, string_end] = timepicker.value ?? [null, null];
-  if (textareain.value !== '' && ((moment(string_start).isValid() && moment(string_end).isValid()) || textregex.value !== '')) {
+  if (textareain.value !== ''
+      && (moment(string_start).isValid()
+          && moment(string_end).isValid()
+          || textregex.value !== '')) {
     // filter date
     let [moment_date_start, moment_date_end] = [moment(string_start), moment(string_end)];
+
     textareaout.value = array_textareain.filter(f => CompareOnlyTime(moment(GetTime(f)), moment_date_start) >= 0
         && CompareOnlyTime(moment(GetTime(f)), moment_date_end) <= 0)
         .map(s => regex_string.test(s) ? s : null)
@@ -158,6 +162,8 @@ const LogFilter = () => {
   }
   IsLoading.value = false;
 };
+
+// 二分查找array_textareain
 
 const MappingData = () => {
   array_textareain = textareain.value
@@ -229,17 +235,9 @@ const GetTime = (s: string) => {
 };
 
 // TimePicker
-const calendarChange = (array: [Date, Date]) => {
+const calendarChange = ref((array: [Date, Date]) => {
   array_datepicker = array;
-};
-
-const makeRange = (start: number, end: number) => {
-  const result: number[] = []
-  for (let i = start; i <= end; i++) {
-    result.push(i)
-  }
-  return result
-};
+});
 
 const disabledDates = ref((date: Date) => {
   return moment(date).isBefore(_.first(datepicker.value), "date")
@@ -307,6 +305,14 @@ const disabledSeconds = ref((hour: number, minute: number) => {
   }
   return array_disabledSeconds;
 }); // end disabledSeconds
+
+const makeRange = (start: number, end: number) => {
+  const result: number[] = []
+  for (let i = start; i <= end; i++) {
+    result.push(i)
+  }
+  return result
+};
 
 const CompareOnlyTime = (time1: any, time2: any) => {
   if (time1.hour() > time2.hour()) {
