@@ -5,6 +5,7 @@
   <el-row>
     <el-col :span="9">
       <el-input
+          id="textareaIn"
           v-model="textareaIn"
           :autosize="{ minRows: 15, maxRows: 30 }"
           type="textarea"
@@ -79,19 +80,24 @@
       </div>
     </el-col>
     <el-col :span="1"></el-col>
-    <el-col :span="9">
+    <el-col :span="9" style="display: flex; flex-direction: column;">
       <el-input
+          v-if="false"
           v-model="textareaOut"
           :autosize="{ minRows: 15, maxRows: 30 }"
           type="textarea"
           readonly
       />
+      <md-editor
+          v-model="textareaOut"
+          style="flex: 1;"
+      ></md-editor>
       <div style="display: flex; float: right">
         <p v-if="ifTimeSpend">
           用时：
         </p>
         <p>
-          {{ timeSpend }}
+          &nbsp{{ timeSpend }}
         </p>
       </div>
     </el-col>
@@ -105,6 +111,8 @@
 import {computed, ref, watch} from "vue";
 import moment from "moment";
 import _ from "lodash";
+import MdEditor from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
@@ -118,6 +126,7 @@ const timepicker = ref<[Date, Date]>();
 const defaultTime = ref<[Date, Date]>();
 const isOneDay = ref<boolean>(true);
 const timeSpend = ref<string>("");
+
 const ifTimeSpend = computed(() => {
   return timeSpend.value !== "";
 });
@@ -206,7 +215,8 @@ const logFilterWithRegex = () => {
       && (moment(timepickerStart).isValid()
           && moment(timepickerEnd).isValid()
           || textRegex.value !== "")) {
-    textareaOut.value = arrayTextareaInFilterByTime.map(s => regexString.test(s) ? s : null)
+    textareaOut.value = arrayTextareaInFilterByTime
+        .map(s => regexString.test(s) ? s.replace(regexString, (value) => "<font color=#66CCFF>" + value + "</font>") : null)
         .filter(f => f !== null)
         .join("\n");
   } else {

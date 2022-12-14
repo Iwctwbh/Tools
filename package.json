@@ -12,6 +12,7 @@
     "@element-plus/icons-vue": "^2.0.10",
     "element-plus": "^2.2.25",
     "lodash": "^4.17.21",
+    "md-editor-v3": "^2.6.0",
     "moment": "^2.29.4",
     "vue": "^3.2.41"
   },
