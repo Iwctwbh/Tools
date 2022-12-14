@@ -1,9 +1,11 @@
 <template>
-  <h1 style="text-align: center;">过滤Log</h1>
+  <h1 style="text-align: center;">
+    过滤Log
+  </h1>
   <el-row>
     <el-col :span="9">
       <el-input
-          v-model="textareain"
+          v-model="textareaIn"
           :autosize="{ minRows: 15, maxRows: 30 }"
           type="textarea"
           placeholder="Please input text"
@@ -14,7 +16,7 @@
       <div class="block">
         <div class="demo-range">
           <el-time-picker
-              v-if="IsOneDay"
+              v-if="isOneDay"
               v-model="timepicker"
               :disabled-hours="disabledHours"
               :disabled-minutes="disabledMinutes"
@@ -27,7 +29,7 @@
           />
         </div>
         <el-date-picker
-            v-if="!IsOneDay"
+            v-if="!isOneDay"
             v-model="datepicker"
             :default-time="defaultTime"
             :disabled-date="disabledDates"
@@ -41,13 +43,13 @@
         />
       </div>
       <el-input
-          v-model="textregex"
+          v-model="textRegex"
           type="text"
           placeholder="Please input regex"
       />
       <div style="display: flex; align-items: center;">
         <el-checkbox
-            v-model="checkbox1"
+            v-model="checkboxRealtime"
             label="实时"
             size="large"
         />
@@ -63,10 +65,10 @@
         </el-tooltip>
         <div style="flex: 1"></div>
         <el-button
-            :disabled="checkbox1"
-            :loading=IsLoading
+            :disabled="checkboxRealtime"
+            :loading=isLoading
             type="primary"
-            @click="LogFilterForBtn"
+            @click="logFilterForBtn"
         >
           过滤
         </el-button>
@@ -75,11 +77,17 @@
     <el-col :span="1"></el-col>
     <el-col :span="9">
       <el-input
-          v-model="textareaout"
+          v-model="textareaOut"
           :autosize="{ minRows: 15, maxRows: 30 }"
           type="textarea"
           readonly
       />
+      <div style="display: flex; float: right">
+        <p v-if="true">
+          用时：
+        </p>
+        <p>test</p>
+      </div>
     </el-col>
   </el-row>
 </template>
@@ -93,98 +101,100 @@ import moment from "moment";
 import _ from "lodash";
 
 // Init
-const textareain = ref('');
-const textregex = ref('');
-const checkbox1 = ref(false);
-const IsLoading = ref(false);
-const textareaout = ref('');
-const datepicker = ref<[Date, Date]>();
-const timepicker = ref<[Date, Date]>();
-const defaultTime = ref<[Date, Date]>();
-const IsOneDay = ref<boolean>(true);
+let sloth: any = {}; // 是否使用命名空间？
+const textareaIn = ref<string>('');
+const textRegex = ref<string>("");
+const checkboxRealtime = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
+const textareaOut = ref<string>("");
+const datepicker = ref<[Date, Date]>([new Date, new Date]);
+const timepicker = ref<[Date, Date]>([new Date, new Date]);
+const defaultTime = ref<[Date, Date]>([new Date, new Date]);
+const isOneDay = ref<boolean>(true);
+const timeSpend = ref<string>("");
 
-const kArrayHours: number[] = Array(24).fill(null).map((item, index) => index);
-const kArrayMinutes: number[] = Array(60).fill(null).map((item, index) => index);
-const kArraySeconds: number[] = Array(60).fill(null).map((item, index) => index);
-const kYearStart: string = "1969T";
+const ARRAY_HOURS: number[] = Array(24).fill(null).map((item, index) => index);
+const ARRAY_MINUTES: number[] = Array(60).fill(null).map((item, index) => index);
+const ARRAY_SECONDS: number[] = Array(60).fill(null).map((item, index) => index);
+const YEAR_START: string = "1969T";
 
-let regex_string = new RegExp('');
-let array_textareain: string[] = [];
-let array_disabledHours: number[] = [];
-let array_disabledHours_start: number[] = [];
-let array_disabledHours_end: number[] = [];
-let array_disabledMinutes_start: number[] = [];
-let array_disabledMinutes_end: number[] = [];
-let array_disabledSeconds_start: number[] = [];
-let array_disabledSeconds_end: number[] = [];
-let array_datepicker: [Date, Date] = [new Date(), new Date()];
-let date_start: string = "";
-let date_end: string = "";
+let regexString = new RegExp('');
+let arrayTextareaIn: string[] = [];
+let arrayDisabledHours: number[] = [];
+let arrayDisabledHoursStart: number[] = [];
+let arrayDisabledHoursEnd: number[] = [];
+let arrayDisabledMinutesStart: number[] = [];
+let arrayDisabledMinutesEnd: number[] = [];
+let arrayDisabledSecondsStart: number[] = [];
+let arrayDisabledSecondsEnd: number[] = [];
+let arrayDatepicker: [Date, Date] = [new Date(), new Date()];
+let dateStart: string = "";
+let dateEnd: string = "";
 
 // Event
-watch([textareain, checkbox1, textregex], () => {
-  regex_string = new RegExp(textregex.value);
-  MappingData();
-  if (checkbox1.value) {
-    LogFilter();
+watch([textareaIn, checkboxRealtime, textRegex], () => {
+  regexString = new RegExp(textRegex.value);
+  mappingData();
+  if (checkboxRealtime.value) {
+    logFilter();
   }
 });
 
 // Function
-const LogFilterForBtn = ref(() => {
+const logFilterForBtn = ref(() => {
   new Promise<void>((resolve) => {
-    IsLoading.value = true;
+    isLoading.value = true;
     setTimeout(() => {
       resolve()
     }, 50);
   }).then(() => {
-    LogFilter();
+    logFilter();
   })
 }); // 过滤
 
-const LogFilter = () => {
-  let [string_start, string_end] = timepicker.value ?? [null, null];
-  if (textareain.value !== ''
-      && (moment(string_start).isValid()
-          && moment(string_end).isValid()
-          || textregex.value !== '')) {
+const logFilter = () => {
+  let [timepickerStart, timepickerEnd] = timepicker.value ?? [null, null];
+  if (textareaIn.value !== ''
+      && (moment(timepickerStart).isValid()
+          && moment(timepickerEnd).isValid()
+          || textRegex.value !== '')) {
     // filter date
-    let [moment_date_start, moment_date_end] = [moment(string_start), moment(string_end)];
+    let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
 
-    textareaout.value = array_textareain.filter(f => CompareOnlyTime(moment(GetTime(f)), moment_date_start) >= 0
-        && CompareOnlyTime(moment(GetTime(f)), moment_date_end) <= 0)
-        .map(s => regex_string.test(s) ? s : null)
+    textareaOut.value = arrayTextareaIn.filter(f => compareOnlyTime(moment(GetTime(f)), momentDateStart) >= 0
+        && compareOnlyTime(moment(GetTime(f)), momentDateEnd) <= 0)
+        .map(s => regexString.test(s) ? s : null)
         //.map(s => s.includes(textregex.value) ? s : null)
         .filter(f => f !== null)
         .join('\n');
   } else {
-    textareaout.value = textareain.value;
+    textareaOut.value = textareaIn.value;
   }
-  IsLoading.value = false;
+  isLoading.value = false;
 };
 
 // 二分查找array_textareain
 
-const MappingData = () => {
-  array_textareain = textareain.value
+const mappingData = () => {
+  arrayTextareaIn = textareaIn.value
       .split('\n').filter(f => f !== "");
 
   // Date
-  if (array_textareain.length > 0) {
-    let string_first: string = _.first(array_textareain) ?? "";
-    let string_last: string = _.last(array_textareain) ?? "";
-    date_start = GetTime(string_first);
-    date_end = GetTime(string_last);
+  if (arrayTextareaIn.length > 0) {
+    let string_first: string = _.first(arrayTextareaIn) ?? "";
+    let string_last: string = _.last(arrayTextareaIn) ?? "";
+    dateStart = GetTime(string_first);
+    dateEnd = GetTime(string_last);
     let moment_date_start = moment(GetTime(string_first));
     let moment_date_end = moment(GetTime(string_last));
-    moment_date_start.isSame(moment_date_end, "date") ? IsOneDay.value = true : IsOneDay.value = false;
-    array_disabledHours_start = makeRange(0, moment_date_start.hour() - 1);
-    array_disabledHours_end = makeRange(moment_date_end.hour() + 1, 23);
-    array_disabledHours = array_disabledHours_start.concat(array_disabledHours_end);
-    array_disabledMinutes_start = makeRange(0, moment_date_start.minute() - 1);
-    array_disabledMinutes_end = makeRange(moment_date_end.minute() + 1, 59);
-    array_disabledSeconds_start = makeRange(0, moment_date_start.second() - 1);
-    array_disabledSeconds_end = makeRange(moment_date_end.second() + 1, 59);
+    moment_date_start.isSame(moment_date_end, "date") ? isOneDay.value = true : isOneDay.value = false;
+    arrayDisabledHoursStart = makeRange(0, moment_date_start.hour() - 1);
+    arrayDisabledHoursEnd = makeRange(moment_date_end.hour() + 1, 23);
+    arrayDisabledHours = arrayDisabledHoursStart.concat(arrayDisabledHoursEnd);
+    arrayDisabledMinutesStart = makeRange(0, moment_date_start.minute() - 1);
+    arrayDisabledMinutesEnd = makeRange(moment_date_end.minute() + 1, 59);
+    arrayDisabledSecondsStart = makeRange(0, moment_date_start.second() - 1);
+    arrayDisabledSecondsEnd = makeRange(moment_date_end.second() + 1, 59);
 
     timepicker.value = [
       new Date(2000, 1, 1, moment_date_start.hour(), moment_date_start.minute(), moment_date_start.second()),
@@ -201,15 +211,15 @@ const MappingData = () => {
       new Date(moment_date_start.year(), moment_date_start.month(), moment_date_start.date(), moment_date_start.hour(), moment_date_start.minute(), moment_date_start.second()),
       new Date(moment_date_end.year(), moment_date_end.month(), moment_date_end.date(), moment_date_end.hour(), moment_date_end.minute(), moment_date_end.second())
     ];
-    array_datepicker = datepicker.value;
+    arrayDatepicker = datepicker.value;
   } else {
 
   }
 };
 
 const GetTime = (s: string) => {
-  let string_moment: string = "";
-  let string_moment_only_time: string = "";
+  let stringMoment: string = "";
+  let stringMomentOnlyTime: string = "";
   s.split('')
       .forEach((v, i) => {
         s.split('')
@@ -219,24 +229,24 @@ const GetTime = (s: string) => {
               if (value.length > 25) {
                 array.splice(1);
               } else {
-                if (moment(value).isValid() && value.length > string_moment.length) {
-                  string_moment = value;
+                if (moment(value).isValid() && value.length > stringMoment.length) {
+                  stringMoment = value;
                 }
-                if (moment(kYearStart.concat(value)).isValid() && value.length > string_moment_only_time.length) {
-                  string_moment_only_time = value;
+                if (moment(YEAR_START.concat(value)).isValid() && value.length > stringMomentOnlyTime.length) {
+                  stringMomentOnlyTime = value;
                 }
               }
               return value;
             });
       });
-  return string_moment.length >= string_moment_only_time.length
-      ? string_moment
-      : kYearStart.concat(string_moment_only_time);
+  return stringMoment.length >= stringMomentOnlyTime.length
+      ? stringMoment
+      : YEAR_START.concat(stringMomentOnlyTime);
 };
 
 // TimePicker
 const calendarChange = ref((array: [Date, Date]) => {
-  array_datepicker = array;
+  arrayDatepicker = array;
 });
 
 const disabledDates = ref((date: Date) => {
@@ -245,65 +255,65 @@ const disabledDates = ref((date: Date) => {
 });
 
 const disabledHours = ref((pos_datepicker: string) => {
-  const moment_date_start = moment(date_start).startOf("date");
-  const moment_date_end = moment(date_end).startOf("date");
+  const momentDateStart = moment(dateStart).startOf("date");
+  const momentDateEnd = moment(dateEnd).startOf("date");
   if (pos_datepicker === "start") {
-    let moment_date_start_current = moment(_.first(array_datepicker)).startOf("date");
-    let array_start_disabledHours: number[] = [];
-    if (moment_date_start_current.isSame(moment_date_start)) {
-      array_start_disabledHours = array_start_disabledHours.concat(array_disabledHours_start);
+    let momentDateStartCurrent = moment(_.first(arrayDatepicker)).startOf("date");
+    let arrayStartDisabledHours: number[] = [];
+    if (momentDateStartCurrent.isSame(momentDateStart)) {
+      arrayStartDisabledHours = arrayStartDisabledHours.concat(arrayDisabledHoursStart);
     }
-    if (moment_date_start_current.isSame(moment_date_end)) {
-      array_start_disabledHours = array_start_disabledHours.concat(array_disabledHours_end);
+    if (momentDateStartCurrent.isSame(momentDateEnd)) {
+      arrayStartDisabledHours = arrayStartDisabledHours.concat(arrayDisabledHoursEnd);
     }
-    return array_start_disabledHours;
+    return arrayStartDisabledHours;
   } else {
-    let moment_date_end_current = moment(_.last(array_datepicker)).startOf("date");
-    let array_end_disabledHours: number[] = [];
-    if (moment_date_end_current.isSame(moment_date_start)) {
-      array_end_disabledHours = array_end_disabledHours.concat(array_disabledHours_start);
+    let momentDateEndCurrent = moment(_.last(arrayDatepicker)).startOf("date");
+    let arrayEndDisabledHours: number[] = [];
+    if (momentDateEndCurrent.isSame(momentDateStart)) {
+      arrayEndDisabledHours = arrayEndDisabledHours.concat(arrayDisabledHoursStart);
     }
-    if (moment_date_end_current.isSame(moment_date_end)) {
-      array_end_disabledHours = array_end_disabledHours.concat(array_disabledHours_end);
+    if (momentDateEndCurrent.isSame(momentDateEnd)) {
+      arrayEndDisabledHours = arrayEndDisabledHours.concat(arrayDisabledHoursEnd);
     }
-    return array_end_disabledHours;
+    return arrayEndDisabledHours;
   }
 }); // end disabledHours
 
 const disabledMinutes = ref((hour: number) => {
-  let array_disabledMinutes: number[] = [];
-  if (_.first(_.difference(kArrayHours, array_disabledHours)) === hour
-      && moment(_.first(array_datepicker))
+  let arrayDisabledMinutes: number[] = [];
+  if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
+      && moment(_.first(arrayDatepicker))
           .startOf("date")
-          .isSame(moment(date_start).startOf("date"))) {
-    array_disabledMinutes = array_disabledMinutes.concat(array_disabledMinutes_start);
+          .isSame(moment(dateStart).startOf("date"))) {
+    arrayDisabledMinutes = arrayDisabledMinutes.concat(arrayDisabledMinutesStart);
   }
-  if (_.last(_.difference(kArrayHours, array_disabledHours)) === hour
-      && moment(_.last(array_datepicker))
+  if (_.last(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
+      && moment(_.last(arrayDatepicker))
           .startOf("date")
-          .isSame(moment(date_end).startOf("date"))) {
-    array_disabledMinutes = array_disabledMinutes.concat(array_disabledMinutes_end);
+          .isSame(moment(dateEnd).startOf("date"))) {
+    arrayDisabledMinutes = arrayDisabledMinutes.concat(arrayDisabledMinutesEnd);
   }
-  return array_disabledMinutes;
+  return arrayDisabledMinutes;
 }); // end disabledMinutes
 
 const disabledSeconds = ref((hour: number, minute: number) => {
-  let array_disabledSeconds: number[] = [];
-  if (_.first(_.difference(kArrayHours, array_disabledHours)) === hour
-      && _.first(_.difference(kArrayMinutes, array_disabledMinutes_start)) === minute
-      && moment(_.first(array_datepicker))
+  let arrayDisabledSeconds: number[] = [];
+  if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
+      && _.first(_.difference(ARRAY_MINUTES, arrayDisabledMinutesStart)) === minute
+      && moment(_.first(arrayDatepicker))
           .startOf("date")
-          .isSame(moment(date_start).startOf("date"))) {
-    array_disabledSeconds = array_disabledSeconds.concat(array_disabledSeconds_start);
+          .isSame(moment(dateStart).startOf("date"))) {
+    arrayDisabledSeconds = arrayDisabledSeconds.concat(arrayDisabledSecondsStart);
   }
-  if (_.last(_.difference(kArrayHours, array_disabledHours)) === hour
-      && _.last(_.difference(kArraySeconds, array_disabledMinutes_end)) === minute
-      && moment(_.last(array_datepicker))
+  if (_.last(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
+      && _.last(_.difference(ARRAY_SECONDS, arrayDisabledMinutesEnd)) === minute
+      && moment(_.last(arrayDatepicker))
           .startOf("date")
-          .isSame(moment(date_end).startOf("date"))) {
-    array_disabledSeconds = array_disabledSeconds.concat(array_disabledSeconds_end);
+          .isSame(moment(dateEnd).startOf("date"))) {
+    arrayDisabledSeconds = arrayDisabledSeconds.concat(arrayDisabledSecondsEnd);
   }
-  return array_disabledSeconds;
+  return arrayDisabledSeconds;
 }); // end disabledSeconds
 
 const makeRange = (start: number, end: number) => {
@@ -314,7 +324,7 @@ const makeRange = (start: number, end: number) => {
   return result
 };
 
-const CompareOnlyTime = (time1: any, time2: any) => {
+const compareOnlyTime = (time1: any, time2: any) => {
   if (time1.hour() > time2.hour()) {
     return 1;
   } else if (time1.hour() < time2.hour()) {
