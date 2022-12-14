@@ -10,6 +10,9 @@
           type="textarea"
           placeholder="Please input text"
       />
+      <p>
+        作者: <a href="https://github.com/Iwctwbh">Iwctwbh</a>
+      </p>
     </el-col>
     <el-col :span="1"></el-col>
     <el-col :span="4">
@@ -46,6 +49,7 @@
           v-model="textRegex"
           type="text"
           placeholder="Please input regex"
+          @keyup="logFilterForRegex"
       />
       <div style="display: flex; align-items: center;">
         <el-checkbox
@@ -83,10 +87,12 @@
           readonly
       />
       <div style="display: flex; float: right">
-        <p v-if="true">
+        <p v-if="ifTimeSpend">
           用时：
         </p>
-        <p>test</p>
+        <p>
+          {{ timeSpend }}
+        </p>
       </div>
     </el-col>
   </el-row>
@@ -95,31 +101,35 @@
 <style scoped>
 </style>
 
-<script setup lang="ts">
-import {ref, watch} from 'vue';
+<script lang='ts' setup>
+import {computed, ref, watch} from "vue";
 import moment from "moment";
 import _ from "lodash";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
-const textareaIn = ref<string>('');
+const textareaIn = ref<string>("");
 const textRegex = ref<string>("");
 const checkboxRealtime = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 const textareaOut = ref<string>("");
-const datepicker = ref<[Date, Date]>([new Date, new Date]);
-const timepicker = ref<[Date, Date]>([new Date, new Date]);
-const defaultTime = ref<[Date, Date]>([new Date, new Date]);
+const datepicker = ref<[Date, Date]>();
+const timepicker = ref<[Date, Date]>();
+const defaultTime = ref<[Date, Date]>();
 const isOneDay = ref<boolean>(true);
 const timeSpend = ref<string>("");
+const ifTimeSpend = computed(() => {
+  return timeSpend.value !== "";
+});
 
 const ARRAY_HOURS: number[] = Array(24).fill(null).map((item, index) => index);
 const ARRAY_MINUTES: number[] = Array(60).fill(null).map((item, index) => index);
 const ARRAY_SECONDS: number[] = Array(60).fill(null).map((item, index) => index);
 const YEAR_START: string = "1969T";
 
-let regexString = new RegExp('');
+let regexString = new RegExp("");
 let arrayTextareaIn: string[] = [];
+let arrayTextareaInFilterByTime: string[] = [];
 let arrayDisabledHours: number[] = [];
 let arrayDisabledHoursStart: number[] = [];
 let arrayDisabledHoursEnd: number[] = [];
@@ -130,63 +140,121 @@ let arrayDisabledSecondsEnd: number[] = [];
 let arrayDatepicker: [Date, Date] = [new Date(), new Date()];
 let dateStart: string = "";
 let dateEnd: string = "";
+let isChanged: boolean = false;
 
 // Event
-watch([textareaIn, checkboxRealtime, textRegex], () => {
-  regexString = new RegExp(textRegex.value);
+watch([textareaIn], () => {
   mappingData();
+  isChanged = true;
   if (checkboxRealtime.value) {
-    logFilter();
+    logFilterForBtn.value();
+  }
+});
+
+watch([checkboxRealtime, textRegex], () => {
+  regexString = new RegExp(textRegex.value);
+  if (checkboxRealtime.value) {
+    logFilterForBtn.value();
+  }
+});
+
+watch([timepicker], () => {
+  isChanged = true;
+  if (checkboxRealtime.value) {
+    logFilterForBtn.value();
   }
 });
 
 // Function
 const logFilterForBtn = ref(() => {
+  let dateTime: Date = new Date();
   new Promise<void>((resolve) => {
     isLoading.value = true;
     setTimeout(() => {
-      resolve()
+      dateTime = new Date();
+      resolve();
     }, 50);
   }).then(() => {
-    logFilter();
-  })
+    logFilterWithRegex();
+    timeSpend.value = moment((new Date().getTime() - dateTime.getTime())).format("mm:ss:SSS");
+  });
 }); // 过滤
 
-const logFilter = () => {
-  let [timepickerStart, timepickerEnd] = timepicker.value ?? [null, null];
-  if (textareaIn.value !== ''
+const logFilterForRegex = ref((e: any) => {
+  if (e.keyCode === 13 && !checkboxRealtime.value) {
+    logFilterForBtn.value();
+  }
+}); // 过滤
+
+const logFilterWithTime = () => {
+  if (isChanged) {
+    // filter date
+    let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
+    let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
+    let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
+    let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString()) - 1;
+    arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
+    isChanged = false;
+  }
+  return arrayTextareaInFilterByTime;
+};
+
+const logFilterWithRegex = () => {
+  logFilterWithTime();
+  let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
+  if (textareaIn.value !== ""
       && (moment(timepickerStart).isValid()
           && moment(timepickerEnd).isValid()
-          || textRegex.value !== '')) {
-    // filter date
-    let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
-
-    textareaOut.value = arrayTextareaIn.filter(f => compareOnlyTime(moment(GetTime(f)), momentDateStart) >= 0
-        && compareOnlyTime(moment(GetTime(f)), momentDateEnd) <= 0)
-        .map(s => regexString.test(s) ? s : null)
-        //.map(s => s.includes(textregex.value) ? s : null)
+          || textRegex.value !== "")) {
+    textareaOut.value = arrayTextareaInFilterByTime.map(s => regexString.test(s) ? s : null)
         .filter(f => f !== null)
-        .join('\n');
+        .join("\n");
   } else {
     textareaOut.value = textareaIn.value;
   }
   isLoading.value = false;
+}; // 过滤
+
+// 二分查找arrayTextareaIn中不大于x的最大值
+const binarySearchMax = (array: string[], x: string) => {
+  let [left, right] = [0, array.length - 1];
+  while (left <= right) {
+    let mid = Math.floor((left + right) / 2);
+    if (compareOnlyTime(moment(getTime(array[mid])), moment(x)) <= 0) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  return right;
 };
 
-// 二分查找array_textareain
+// 二分查找arrayTextareaIn中不小x的最小值
+const binarySearchMin = (array: string[], x: string) => {
+  let [left, right] = [0, array.length - 1];
+  while (left <= right) {
+    let mid = Math.floor((left + right) / 2);
+    if (compareOnlyTime(moment(getTime(array[mid])), moment(x)) >= 0) {
+      right = mid - 1;
+    } else {
+      left = mid + 1;
+    }
+  }
+  return left;
+};
 
 const mappingData = () => {
   arrayTextareaIn = textareaIn.value
-      .split('\n').filter(f => f !== "");
+      .split("\n").filter(f => f !== "");
 
   // Date
   if (arrayTextareaIn.length > 0) {
     let string_first: string = _.first(arrayTextareaIn) ?? "";
     let string_last: string = _.last(arrayTextareaIn) ?? "";
-    dateStart = GetTime(string_first);
-    dateEnd = GetTime(string_last);
-    let moment_date_start = moment(GetTime(string_first));
-    let moment_date_end = moment(GetTime(string_last));
+    dateStart = getTime(string_first);
+    dateEnd = getTime(string_last);
+    let moment_date_start = moment(getTime(string_first));
+    let moment_date_end = moment(getTime(string_last));
     moment_date_start.isSame(moment_date_end, "date") ? isOneDay.value = true : isOneDay.value = false;
     arrayDisabledHoursStart = makeRange(0, moment_date_start.hour() - 1);
     arrayDisabledHoursEnd = makeRange(moment_date_end.hour() + 1, 23);
@@ -199,7 +267,7 @@ const mappingData = () => {
     timepicker.value = [
       new Date(2000, 1, 1, moment_date_start.hour(), moment_date_start.minute(), moment_date_start.second()),
       new Date(2000, 1, 2, moment_date_end.hour(), moment_date_end.minute(), moment_date_end.second())
-    ]
+    ];
 
     // 无效 等修复 ?? 突然又好了
     defaultTime.value = [
@@ -215,14 +283,14 @@ const mappingData = () => {
   } else {
 
   }
-};
+}; // 映射数据
 
-const GetTime = (s: string) => {
+const getTime = (s: string) => {
   let stringMoment: string = "";
   let stringMomentOnlyTime: string = "";
-  s.split('')
+  s.split("")
       .forEach((v, i) => {
-        s.split('')
+        s.split("")
             .splice(i)
             .reduce((previousValue, currentValue, currentIndex, array) => {
               let value = previousValue + currentValue;
@@ -242,17 +310,17 @@ const GetTime = (s: string) => {
   return stringMoment.length >= stringMomentOnlyTime.length
       ? stringMoment
       : YEAR_START.concat(stringMomentOnlyTime);
-};
+}; // 获取时间
 
 // TimePicker
 const calendarChange = ref((array: [Date, Date]) => {
   arrayDatepicker = array;
-});
+}); // 日期选择器
 
 const disabledDates = ref((date: Date) => {
   return moment(date).isBefore(_.first(datepicker.value), "date")
       || moment(date).isAfter(_.last(datepicker.value), "date");
-});
+}); // 日期不可选
 
 const disabledHours = ref((pos_datepicker: string) => {
   const momentDateStart = moment(dateStart).startOf("date");
@@ -317,12 +385,12 @@ const disabledSeconds = ref((hour: number, minute: number) => {
 }); // end disabledSeconds
 
 const makeRange = (start: number, end: number) => {
-  const result: number[] = []
+  const result: number[] = [];
   for (let i = start; i <= end; i++) {
-    result.push(i)
+    result.push(i);
   }
-  return result
-};
+  return result;
+}; // end makeRange
 
 const compareOnlyTime = (time1: any, time2: any) => {
   if (time1.hour() > time2.hour()) {
