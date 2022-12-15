@@ -166,6 +166,9 @@ let arrayDatepicker: [Date, Date] = [new Date(), new Date()];
 let dateStart: string = "";
 let dateEnd: string = "";
 let isChanged: boolean = false;
+let isOnlyTime: boolean = false;
+let recognitionTimeStart: number = 0;
+let recognitionTimeEnd: number = 0;
 
 // Event
 watch([textareaIn], (): void => {
@@ -217,7 +220,7 @@ const logFilterWithTime = (): string[] => {
     let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
     let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
     let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
-    let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString()) - 1;
+    let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString());
     arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
     isChanged = false;
   }
@@ -277,10 +280,11 @@ const mappingData = (): void => {
   // Date
   if (arrayTextareaIn.length > 0) {
     let string_first: string = _.first(arrayTextareaIn) ?? "";
-    let string_last: string = _.last(arrayTextareaIn) ?? "";
     dateStart = recognitionTime(string_first);
-    dateEnd = recognitionTime(string_last);
     let moment_date_start = moment(recognitionTime(string_first));
+    FilterByBreakLine();
+    let string_last: string = _.last(arrayTextareaIn) ?? "";
+    dateEnd = recognitionTime(string_last);
     let moment_date_end = moment(recognitionTime(string_last));
     moment_date_start.isSame(moment_date_end, "date") ? isOneDay.value = true : isOneDay.value = false;
     arrayDisabledHoursStart = makeRange(0, moment_date_start.hour() - 1);
@@ -315,6 +319,8 @@ const mappingData = (): void => {
 const recognitionTime = (s: string): string => {
   let stringMoment: string = "";
   let stringMomentOnlyTime: string = "";
+  let indexStringMoment: number = 0;
+  let indexStringMomentOnlyTime: number = 0;
   s.split("")
       .forEach((v, i) => {
         s.split("")
@@ -326,18 +332,49 @@ const recognitionTime = (s: string): string => {
               } else {
                 if (moment(value).isValid() && value.length > stringMoment.length) {
                   stringMoment = value;
+                  indexStringMoment = i;
                 }
                 if (moment(YEAR_START.concat(value)).isValid() && value.length > stringMomentOnlyTime.length) {
                   stringMomentOnlyTime = value;
+                  indexStringMomentOnlyTime = i;
                 }
               }
               return value;
             });
       });
+  if (stringMoment.length >= stringMomentOnlyTime.length) {
+    recognitionTimeStart = indexStringMoment;
+    recognitionTimeEnd = indexStringMoment + stringMoment.length;
+    isOnlyTime = false;
+  } else {
+    recognitionTimeStart = indexStringMomentOnlyTime;
+    recognitionTimeEnd = indexStringMomentOnlyTime + stringMomentOnlyTime.length;
+    isOnlyTime = true;
+  }
   return stringMoment.length >= stringMomentOnlyTime.length
       ? stringMoment
       : YEAR_START.concat(stringMomentOnlyTime);
 }; // 获取时间
+
+const recognitionTimeCheck = (s: string): boolean => {
+  if (isOnlyTime) {
+    return moment(YEAR_START.concat(s.slice(recognitionTimeStart, recognitionTimeEnd))).isValid();
+  } else {
+    return moment(s.slice(recognitionTimeStart, recognitionTimeEnd)).isValid();
+  }
+};
+
+const FilterByBreakLine = (): void => {
+  var tempArray: string[] = [];
+  arrayTextareaIn.forEach((v, i) => {
+    if (recognitionTimeCheck(v)) {
+      tempArray.push(v);
+    } else {
+      tempArray[tempArray.length - 1] = tempArray[tempArray.length - 1].concat("\r\n").concat(v);
+    }
+  });
+  arrayTextareaIn = tempArray;
+}; // FilterByBreakLine
 
 // TimePicker
 const calendarChange = ref((array: [Date, Date]): void => {
