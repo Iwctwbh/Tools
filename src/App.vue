@@ -3,6 +3,17 @@
     过滤Log
   </h1>
   <el-row>
+    <el-col :span="9"></el-col>
+    <el-col :offset="1" :span="4"></el-col>
+    <el-col :offset="1" :span="9">
+      <span class="demonstration">高亮字体颜色</span>
+      <el-color-picker v-model="colorPickerFont"/>
+      &nbsp;
+      <span class="demonstration">高亮字体背景颜色</span>
+      <el-color-picker v-model="colorPickerFontBackground"/>
+    </el-col>
+  </el-row>
+  <el-row>
     <el-col :span="9">
       <el-input
           id="textareaIn"
@@ -14,24 +25,24 @@
       <p>
         作者: <a href="https://github.com/Iwctwbh">Iwctwbh</a>
       </p>
+      <p>
+        本项目开源: <a href="https://github.com/Iwctwbh/LogFilter">https://github.com/Iwctwbh/LogFilter</a>
+      </p>
     </el-col>
-    <el-col :span="1"></el-col>
-    <el-col :span="4">
-      <div class="block">
-        <div class="demo-range">
-          <el-time-picker
-              v-if="isOneDay"
-              v-model="timepicker"
-              :disabled-hours="disabledHours"
-              :disabled-minutes="disabledMinutes"
-              :disabled-seconds="disabledSeconds"
-              end-placeholder="End time"
-              is-range
-              placeholder="Arbitrary time"
-              range-separator="To"
-              start-placeholder="Start time"
-          />
-        </div>
+    <el-col :offset="1" :span="4">
+      <div style="padding-bottom: 10px">
+        <el-time-picker
+            v-if="isOneDay"
+            v-model="timepicker"
+            :disabled-hours="disabledHours"
+            :disabled-minutes="disabledMinutes"
+            :disabled-seconds="disabledSeconds"
+            end-placeholder="End time"
+            is-range
+            placeholder="Arbitrary time"
+            range-separator="To"
+            start-placeholder="Start time"
+        />
         <el-date-picker
             v-if="!isOneDay"
             v-model="datepicker"
@@ -79,8 +90,11 @@
         </el-button>
       </div>
     </el-col>
-    <el-col :span="1"></el-col>
-    <el-col :span="9" style="display: flex; flex-direction: column;">
+    <el-col
+        :offset="1"
+        :span="9"
+        style="display: flex; flex-direction: column;"
+    >
       <el-input
           v-if="false"
           v-model="textareaOut"
@@ -126,8 +140,10 @@ const timepicker = ref<[Date, Date]>();
 const defaultTime = ref<[Date, Date]>();
 const isOneDay = ref<boolean>(true);
 const timeSpend = ref<string>("");
+const colorPickerFont = ref<string>("#66CCFF");
+const colorPickerFontBackground = ref<string>("#FFFFFF");
 
-const ifTimeSpend = computed(() => {
+const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
 });
 
@@ -152,7 +168,7 @@ let dateEnd: string = "";
 let isChanged: boolean = false;
 
 // Event
-watch([textareaIn], () => {
+watch([textareaIn], (): void => {
   mappingData();
   isChanged = true;
   if (checkboxRealtime.value) {
@@ -160,14 +176,14 @@ watch([textareaIn], () => {
   }
 });
 
-watch([checkboxRealtime, textRegex], () => {
+watch([checkboxRealtime, textRegex], (): void => {
   regexString = new RegExp(textRegex.value);
   if (checkboxRealtime.value) {
     logFilterForBtn.value();
   }
 });
 
-watch([timepicker], () => {
+watch([timepicker], (): void => {
   isChanged = true;
   if (checkboxRealtime.value) {
     logFilterForBtn.value();
@@ -175,7 +191,7 @@ watch([timepicker], () => {
 });
 
 // Function
-const logFilterForBtn = ref(() => {
+const logFilterForBtn = ref((): void => {
   let dateTime: Date = new Date();
   new Promise<void>((resolve) => {
     isLoading.value = true;
@@ -189,13 +205,13 @@ const logFilterForBtn = ref(() => {
   });
 }); // 过滤
 
-const logFilterForRegex = ref((e: any) => {
+const logFilterForRegex = ref((e: any): void => {
   if (e.keyCode === 13 && !checkboxRealtime.value) {
     logFilterForBtn.value();
   }
 }); // 过滤
 
-const logFilterWithTime = () => {
+const logFilterWithTime = (): string[] => {
   if (isChanged) {
     // filter date
     let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
@@ -208,15 +224,16 @@ const logFilterWithTime = () => {
   return arrayTextareaInFilterByTime;
 };
 
-const logFilterWithRegex = () => {
+const logFilterWithRegex = (): void => {
   logFilterWithTime();
   let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
-  if (textareaIn.value !== ""
-      && (moment(timepickerStart).isValid()
-          && moment(timepickerEnd).isValid()
-          || textRegex.value !== "")) {
+  let isFilterFiled = (moment(timepickerStart).isValid() && moment(timepickerEnd).isValid()) || textRegex.value !== "";
+  if (textareaIn.value !== "" && isFilterFiled) {
     textareaOut.value = arrayTextareaInFilterByTime
-        .map(s => regexString.test(s) ? s.replace(regexString, (value) => "<font color=#66CCFF>" + value + "</font>") : null)
+        .map(s => regexString.test(s)
+            ? s.replace(regexString, (value) =>
+                `<font color=${colorPickerFont.value} style="background-color: ${colorPickerFontBackground.value}">${value}</font>`)
+            : null)
         .filter(f => f !== null)
         .join("\n");
   } else {
@@ -226,11 +243,11 @@ const logFilterWithRegex = () => {
 }; // 过滤
 
 // 二分查找arrayTextareaIn中不大于x的最大值
-const binarySearchMax = (array: string[], x: string) => {
+const binarySearchMax = (array: string[], x: string): number => {
   let [left, right] = [0, array.length - 1];
   while (left <= right) {
     let mid = Math.floor((left + right) / 2);
-    if (compareOnlyTime(moment(getTime(array[mid])), moment(x)) <= 0) {
+    if (compareOnlyTime(moment(recognitionTime(array[mid])), moment(x)) <= 0) {
       left = mid + 1;
     } else {
       right = mid - 1;
@@ -240,11 +257,11 @@ const binarySearchMax = (array: string[], x: string) => {
 };
 
 // 二分查找arrayTextareaIn中不小x的最小值
-const binarySearchMin = (array: string[], x: string) => {
+const binarySearchMin = (array: string[], x: string): number => {
   let [left, right] = [0, array.length - 1];
   while (left <= right) {
     let mid = Math.floor((left + right) / 2);
-    if (compareOnlyTime(moment(getTime(array[mid])), moment(x)) >= 0) {
+    if (compareOnlyTime(moment(recognitionTime(array[mid])), moment(x)) >= 0) {
       right = mid - 1;
     } else {
       left = mid + 1;
@@ -253,7 +270,7 @@ const binarySearchMin = (array: string[], x: string) => {
   return left;
 };
 
-const mappingData = () => {
+const mappingData = (): void => {
   arrayTextareaIn = textareaIn.value
       .split("\n").filter(f => f !== "");
 
@@ -261,10 +278,10 @@ const mappingData = () => {
   if (arrayTextareaIn.length > 0) {
     let string_first: string = _.first(arrayTextareaIn) ?? "";
     let string_last: string = _.last(arrayTextareaIn) ?? "";
-    dateStart = getTime(string_first);
-    dateEnd = getTime(string_last);
-    let moment_date_start = moment(getTime(string_first));
-    let moment_date_end = moment(getTime(string_last));
+    dateStart = recognitionTime(string_first);
+    dateEnd = recognitionTime(string_last);
+    let moment_date_start = moment(recognitionTime(string_first));
+    let moment_date_end = moment(recognitionTime(string_last));
     moment_date_start.isSame(moment_date_end, "date") ? isOneDay.value = true : isOneDay.value = false;
     arrayDisabledHoursStart = makeRange(0, moment_date_start.hour() - 1);
     arrayDisabledHoursEnd = makeRange(moment_date_end.hour() + 1, 23);
@@ -295,7 +312,7 @@ const mappingData = () => {
   }
 }; // 映射数据
 
-const getTime = (s: string) => {
+const recognitionTime = (s: string): string => {
   let stringMoment: string = "";
   let stringMomentOnlyTime: string = "";
   s.split("")
@@ -323,16 +340,16 @@ const getTime = (s: string) => {
 }; // 获取时间
 
 // TimePicker
-const calendarChange = ref((array: [Date, Date]) => {
+const calendarChange = ref((array: [Date, Date]): void => {
   arrayDatepicker = array;
 }); // 日期选择器
 
-const disabledDates = ref((date: Date) => {
+const disabledDates = ref((date: Date): boolean => {
   return moment(date).isBefore(_.first(datepicker.value), "date")
       || moment(date).isAfter(_.last(datepicker.value), "date");
 }); // 日期不可选
 
-const disabledHours = ref((pos_datepicker: string) => {
+const disabledHours = ref((pos_datepicker: string): number[] => {
   const momentDateStart = moment(dateStart).startOf("date");
   const momentDateEnd = moment(dateEnd).startOf("date");
   if (pos_datepicker === "start") {
@@ -358,7 +375,7 @@ const disabledHours = ref((pos_datepicker: string) => {
   }
 }); // end disabledHours
 
-const disabledMinutes = ref((hour: number) => {
+const disabledMinutes = ref((hour: number): number[] => {
   let arrayDisabledMinutes: number[] = [];
   if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
       && moment(_.first(arrayDatepicker))
@@ -375,7 +392,7 @@ const disabledMinutes = ref((hour: number) => {
   return arrayDisabledMinutes;
 }); // end disabledMinutes
 
-const disabledSeconds = ref((hour: number, minute: number) => {
+const disabledSeconds = ref((hour: number, minute: number): number[] => {
   let arrayDisabledSeconds: number[] = [];
   if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
       && _.first(_.difference(ARRAY_MINUTES, arrayDisabledMinutesStart)) === minute
@@ -394,7 +411,7 @@ const disabledSeconds = ref((hour: number, minute: number) => {
   return arrayDisabledSeconds;
 }); // end disabledSeconds
 
-const makeRange = (start: number, end: number) => {
+const makeRange = (start: number, end: number): number[] => {
   const result: number[] = [];
   for (let i = start; i <= end; i++) {
     result.push(i);
@@ -402,7 +419,7 @@ const makeRange = (start: number, end: number) => {
   return result;
 }; // end makeRange
 
-const compareOnlyTime = (time1: any, time2: any) => {
+const compareOnlyTime = (time1: any, time2: any): number => {
   if (time1.hour() > time2.hour()) {
     return 1;
   } else if (time1.hour() < time2.hour()) {
@@ -420,7 +437,3 @@ const compareOnlyTime = (time1: any, time2: any) => {
   }
 }; // end CompareOnlyTime
 </script>
-
-<style scoped>
-
-</style>
