@@ -5,12 +5,19 @@
   <el-row>
     <el-col :span="9"></el-col>
     <el-col :offset="1" :span="4"></el-col>
-    <el-col :offset="1" :span="9">
-      <span class="demonstration">高亮字体颜色</span>
-      <el-color-picker v-model="colorPickerFont"/>
-      &nbsp;
-      <span class="demonstration">高亮字体背景颜色</span>
-      <el-color-picker v-model="colorPickerFontBackground"/>
+    <el-col :offset="1" :span="9" style="display: flex; align-items: center;">
+      <el-radio-group v-model="reader" class="ml-4" style="padding-right: 10px" @change="logFilterForBtn">
+        <el-radio label="Markdown" size="large">Markdown</el-radio>
+        <el-radio label="Textarea" size="large">Textarea</el-radio>
+        <el-radio label="Table" size="large">Table</el-radio>
+      </el-radio-group>
+      <div v-if="reader !== 'Textarea'">
+        <span class="demonstration">高亮字体颜色</span>
+        <el-color-picker v-model="colorPickerFont"/>
+        &nbsp;
+        <span class="demonstration">高亮字体背景颜色</span>
+        <el-color-picker v-model="colorPickerFontBackground"/>
+      </div>
     </el-col>
   </el-row>
   <el-row>
@@ -96,24 +103,35 @@
         style="display: flex; flex-direction: column;"
     >
       <el-input
-          v-if="false"
+          v-if="reader === 'Textarea'"
           v-model="textareaOut"
           :autosize="{ minRows: 15, maxRows: 30 }"
           type="textarea"
           readonly
       />
       <md-editor
+          v-if="reader === 'Markdown'"
           v-model="textareaOut"
           style="flex: 1;"
       ></md-editor>
+      <el-table
+          v-if="reader === 'Table'"
+          :data="tableData"
+          style="max-height: 625px;"
+      >
+        <el-table-column v-slot="scope" label="Data" prop="data">
+          <div v-html="scope.row.data"></div>
+        </el-table-column>
+      </el-table>
       <div style="display: flex; float: right">
         <p v-if="ifTimeSpend">
           用时：
         </p>
         <p>
-          &nbsp{{ timeSpend }}
+          {{ timeSpend }}
         </p>
       </div>
+      <p>&nbsp;</p>
     </el-col>
   </el-row>
 </template>
@@ -142,6 +160,8 @@ const isOneDay = ref<boolean>(true);
 const timeSpend = ref<string>("");
 const colorPickerFont = ref<string>("#66CCFF");
 const colorPickerFontBackground = ref<string>("#FFFFFF");
+const reader = ref<string>("Markdown");
+const tableData = ref<any[]>([]);
 
 const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
@@ -151,6 +171,7 @@ const ARRAY_HOURS: number[] = Array(24).fill(null).map((item, index) => index);
 const ARRAY_MINUTES: number[] = Array(60).fill(null).map((item, index) => index);
 const ARRAY_SECONDS: number[] = Array(60).fill(null).map((item, index) => index);
 const YEAR_START: string = "1969T";
+const REGEX_TIME: RegExp = /(((\d{4}[\/\-]?\d{1,2}[\/\-]?\d{1,2})|(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}))[T ])?\d{1,2}\:\d{1,2}:\d{1,2}(\.\d{1,3})?/g;
 
 let regexString = new RegExp("");
 let arrayTextareaIn: string[] = [];
@@ -166,6 +187,9 @@ let arrayDatepicker: [Date, Date] = [new Date(), new Date()];
 let dateStart: string = "";
 let dateEnd: string = "";
 let isChanged: boolean = false;
+let isOnlyTime: boolean = false;
+let recognitionTimeStart: number = 0;
+let recognitionTimeEnd: number = 0;
 
 // Event
 watch([textareaIn], (): void => {
@@ -217,7 +241,7 @@ const logFilterWithTime = (): string[] => {
     let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
     let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
     let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
-    let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString()) - 1;
+    let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString());
     arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
     isChanged = false;
   }
@@ -229,13 +253,34 @@ const logFilterWithRegex = (): void => {
   let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
   let isFilterFiled = (moment(timepickerStart).isValid() && moment(timepickerEnd).isValid()) || textRegex.value !== "";
   if (textareaIn.value !== "" && isFilterFiled) {
-    textareaOut.value = arrayTextareaInFilterByTime
-        .map(s => regexString.test(s)
-            ? s.replace(regexString, (value) =>
-                `<font color=${colorPickerFont.value} style="background-color: ${colorPickerFontBackground.value}">${value}</font>`)
-            : null)
-        .filter(f => f !== null)
-        .join("\n");
+    if (textRegex.value !== "") {
+      if (reader.value === "Markdown" || reader.value === "Table") {
+        let tempArray = arrayTextareaInFilterByTime
+            .map(s => regexString.test(s)
+                ? s.replace(regexString, (value) =>
+                    `<label style="background-color: ${colorPickerFontBackground.value}; color:${colorPickerFont.value};">${value}</label>`)
+                : null)
+            .filter(f => f !== null);
+        textareaOut.value = tempArray.join("\n");
+
+        tableData.value = [];
+        tempArray.forEach(f => tableData.value.push({data: f}));
+      } else {
+        let tempArray = arrayTextareaInFilterByTime
+            .map(s => regexString.test(s)
+                ? s
+                : null)
+            .filter(f => f !== null);
+        textareaOut.value = tempArray.join("\n");
+
+        tableData.value = [];
+        tempArray.forEach(f => tableData.value.push({data: f}));
+      }
+    } else {
+      textareaOut.value = arrayTextareaInFilterByTime.join("\n");
+      tableData.value = [];
+      arrayTextareaInFilterByTime.forEach(f => tableData.value.push({data: f}));
+    }
   } else {
     textareaOut.value = textareaIn.value;
   }
@@ -277,10 +322,11 @@ const mappingData = (): void => {
   // Date
   if (arrayTextareaIn.length > 0) {
     let string_first: string = _.first(arrayTextareaIn) ?? "";
-    let string_last: string = _.last(arrayTextareaIn) ?? "";
     dateStart = recognitionTime(string_first);
-    dateEnd = recognitionTime(string_last);
     let moment_date_start = moment(recognitionTime(string_first));
+    FilterByBreakLine();
+    let string_last: string = _.last(arrayTextareaIn) ?? "";
+    dateEnd = recognitionTime(string_last);
     let moment_date_end = moment(recognitionTime(string_last));
     moment_date_start.isSame(moment_date_end, "date") ? isOneDay.value = true : isOneDay.value = false;
     arrayDisabledHoursStart = makeRange(0, moment_date_start.hour() - 1);
@@ -315,6 +361,8 @@ const mappingData = (): void => {
 const recognitionTime = (s: string): string => {
   let stringMoment: string = "";
   let stringMomentOnlyTime: string = "";
+  let indexStringMoment: number = 0;
+  let indexStringMomentOnlyTime: number = 0;
   s.split("")
       .forEach((v, i) => {
         s.split("")
@@ -323,21 +371,52 @@ const recognitionTime = (s: string): string => {
               let value = previousValue + currentValue;
               if (value.length > 25) {
                 array.splice(1);
-              } else {
-                if (moment(value).isValid() && value.length > stringMoment.length) {
+              } else if (value.length > 8) {
+                if (value.length > stringMoment.length && moment(value).isValid() && REGEX_TIME.test(value)) {
                   stringMoment = value;
+                  indexStringMoment = i;
                 }
-                if (moment(YEAR_START.concat(value)).isValid() && value.length > stringMomentOnlyTime.length) {
+                if (value.length > stringMomentOnlyTime.length && moment(YEAR_START.concat(value)).isValid() && REGEX_TIME.test(value)) {
                   stringMomentOnlyTime = value;
+                  indexStringMomentOnlyTime = i;
                 }
               }
               return value;
             });
       });
+  if (stringMoment.length >= stringMomentOnlyTime.length) {
+    recognitionTimeStart = indexStringMoment;
+    recognitionTimeEnd = indexStringMoment + stringMoment.length;
+    isOnlyTime = false;
+  } else {
+    recognitionTimeStart = indexStringMomentOnlyTime;
+    recognitionTimeEnd = indexStringMomentOnlyTime + stringMomentOnlyTime.length;
+    isOnlyTime = true;
+  }
   return stringMoment.length >= stringMomentOnlyTime.length
       ? stringMoment
       : YEAR_START.concat(stringMomentOnlyTime);
 }; // 获取时间
+
+const recognitionTimeCheck = (s: string): boolean => {
+  if (isOnlyTime) {
+    return moment(YEAR_START.concat(s.slice(recognitionTimeStart, recognitionTimeEnd))).isValid();
+  } else {
+    return moment(s.slice(recognitionTimeStart, recognitionTimeEnd)).isValid();
+  }
+};
+
+const FilterByBreakLine = (): void => {
+  var tempArray: string[] = [];
+  arrayTextareaIn.forEach((v, i) => {
+    if (recognitionTimeCheck(v)) {
+      tempArray.push(v);
+    } else {
+      tempArray[tempArray.length - 1] = tempArray[tempArray.length - 1].concat("\r\n").concat(v);
+    }
+  });
+  arrayTextareaIn = tempArray;
+}; // FilterByBreakLine
 
 // TimePicker
 const calendarChange = ref((array: [Date, Date]): void => {
