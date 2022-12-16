@@ -6,10 +6,10 @@
     <el-col :span="9"></el-col>
     <el-col :offset="1" :span="4"></el-col>
     <el-col :offset="1" :span="9" style="display: flex; align-items: center;">
-      <el-radio-group v-model="reader" class="ml-4" style="padding-right: 10px" @change="logFilterForBtn">
-        <el-radio label="Markdown" size="large">Markdown</el-radio>
-        <el-radio label="Textarea" size="large">Textarea</el-radio>
+      <el-radio-group v-model="reader" class="ml-4" style="padding-right: 10px" @change="readerChange">
         <el-radio label="Table" size="large">Table</el-radio>
+        <el-radio label="Textarea" size="large">Textarea</el-radio>
+        <el-radio label="Markdown" size="large">Markdown</el-radio>
       </el-radio-group>
       <div v-if="reader !== 'Textarea'">
         <span class="demonstration">高亮字体颜色</span>
@@ -102,6 +102,19 @@
         :span="9"
         style="display: flex; flex-direction: column;"
     >
+      <el-table
+          v-if="reader === 'Table'"
+          :data="tableData"
+          :show-header="false"
+          style="max-height: 625px;"
+      >
+        <el-table-column
+            v-slot="scope"
+            label="Data"
+            prop="data">
+          <div v-html="scope.row.data"></div>
+        </el-table-column>
+      </el-table>
       <el-input
           v-if="reader === 'Textarea'"
           v-model="textareaOut"
@@ -114,15 +127,6 @@
           v-model="textareaOut"
           style="flex: 1;"
       ></md-editor>
-      <el-table
-          v-if="reader === 'Table'"
-          :data="tableData"
-          style="max-height: 625px;"
-      >
-        <el-table-column v-slot="scope" label="Data" prop="data">
-          <div v-html="scope.row.data"></div>
-        </el-table-column>
-      </el-table>
       <div style="display: flex; float: right">
         <p v-if="ifTimeSpend">
           用时：
@@ -160,7 +164,7 @@ const isOneDay = ref<boolean>(true);
 const timeSpend = ref<string>("");
 const colorPickerFont = ref<string>("#66CCFF");
 const colorPickerFontBackground = ref<string>("#FFFFFF");
-const reader = ref<string>("Markdown");
+const reader = ref<string>("Table");
 const tableData = ref<any[]>([]);
 
 const ifTimeSpend = computed<boolean>(() => {
@@ -195,6 +199,7 @@ let recognitionTimeEnd: number = 0;
 watch([textareaIn], (): void => {
   mappingData();
   isChanged = true;
+  arrayTextareaInFilterByTime = [];
   if (checkboxRealtime.value) {
     logFilterForBtn.value();
   }
@@ -209,10 +214,17 @@ watch([checkboxRealtime, textRegex], (): void => {
 
 watch([timepicker], (): void => {
   isChanged = true;
+  arrayTextareaInFilterByTime = [];
   if (checkboxRealtime.value) {
     logFilterForBtn.value();
   }
 });
+
+const readerChange = (value: string): void => {
+  if (arrayTextareaInFilterByTime.length !== 0) {
+    logFilterForBtn.value();
+  }
+};
 
 // Function
 const logFilterForBtn = ref((): void => {
@@ -400,9 +412,9 @@ const recognitionTime = (s: string): string => {
 
 const recognitionTimeCheck = (s: string): boolean => {
   if (isOnlyTime) {
-    return moment(YEAR_START.concat(s.slice(recognitionTimeStart, recognitionTimeEnd))).isValid();
+    return moment(YEAR_START.concat(s.slice(recognitionTimeStart, recognitionTimeEnd))).isValid() && REGEX_TIME.test(YEAR_START.concat(s.slice(recognitionTimeStart, recognitionTimeEnd)));
   } else {
-    return moment(s.slice(recognitionTimeStart, recognitionTimeEnd)).isValid();
+    return moment(s.slice(recognitionTimeStart, recognitionTimeEnd)).isValid() && REGEX_TIME.test(s.slice(recognitionTimeStart, recognitionTimeEnd));
   }
 };
 
