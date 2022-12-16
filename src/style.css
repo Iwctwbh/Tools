@@ -22,3 +22,11 @@
 #app #md-editor-v3-preview {
     padding: 5px 11px;
 }
+
+#app .tools {
+    margin: 0px;
+}
+
+#app .tools .el-checkbox__inner {
+    display: none;
+}

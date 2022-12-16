@@ -69,27 +69,55 @@
           type="text"
           placeholder="Please input regex"
           @keyup="logFilterForRegex"
+          style="padding-bottom: 10px;"
       />
-      <div style="display: flex; align-items: center;">
+      <div style="display: flex; justify-content: space-between;">
         <el-checkbox
-            v-model="checkboxRealtime"
-            label="实时"
-            size="large"
-        />
-        <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="性能堪忧"
-            placement="bottom"
+            v-model="isCaseMatch"
+            border
+            class="tools"
+            title="区分大小写"
         >
-          <el-icon>
-            <QuestionFilled/>
-          </el-icon>
-        </el-tooltip>
-        <div style="flex: 1"></div>
+          <strong style="font-size: 16px">
+            Aa
+          </strong>
+        </el-checkbox>
+
+        <el-checkbox
+            v-model="isRegexMatch"
+            border
+            class="tools"
+            title="正则表达式"
+        >
+          <strong style="font-size: 20px;">
+            .*
+          </strong>
+        </el-checkbox>
+
+        <el-checkbox
+            v-model="isRealtime"
+            border
+            class="tools"
+            style="margin-right: 0px"
+            title="实时过滤"
+        >
+          <strong>
+            实时
+          </strong>
+          <el-tooltip
+              class="box-item"
+              content="性能堪忧"
+              effect="dark"
+              placement="bottom"
+          >
+            <el-icon>
+              <QuestionFilled/>
+            </el-icon>
+          </el-tooltip>
+        </el-checkbox>
         <el-button
-            :disabled="checkboxRealtime"
-            :loading=isLoading
+            :disabled="isRealtime"
+            :loading="isLoading"
             type="primary"
             @click="logFilterForBtn"
         >
@@ -154,7 +182,7 @@ import "md-editor-v3/lib/style.css";
 let sloth: any = {}; // 是否使用命名空间？
 const textareaIn = ref<string>("");
 const textRegex = ref<string>("");
-const checkboxRealtime = ref<boolean>(false);
+const isRealtime = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 const textareaOut = ref<string>("");
 const datepicker = ref<[Date, Date]>();
@@ -166,6 +194,8 @@ const colorPickerFont = ref<string>("#66CCFF");
 const colorPickerFontBackground = ref<string>("#FFFFFF");
 const reader = ref<string>("Table");
 const tableData = ref<any[]>([]);
+const isCaseMatch = ref<boolean>(false);
+const isRegexMatch = ref<boolean>(false);
 
 const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
@@ -190,7 +220,8 @@ let arrayDisabledSecondsEnd: number[] = [];
 let arrayDatepicker: [Date, Date] = [new Date(), new Date()];
 let dateStart: string = "";
 let dateEnd: string = "";
-let isChanged: boolean = false;
+let isTextareaInOrTimeChange: boolean = false;
+let isRegexChange: boolean = true;
 let isOnlyTime: boolean = false;
 let recognitionTimeStart: number = 0;
 let recognitionTimeEnd: number = 0;
@@ -198,30 +229,31 @@ let recognitionTimeEnd: number = 0;
 // Event
 watch([textareaIn], (): void => {
   mappingData();
-  isChanged = true;
+  isTextareaInOrTimeChange = true;
   arrayTextareaInFilterByTime = [];
-  if (checkboxRealtime.value) {
+  if (isRealtime.value) {
     logFilterForBtn.value();
   }
 });
 
-watch([checkboxRealtime, textRegex], (): void => {
-  regexString = new RegExp(textRegex.value);
-  if (checkboxRealtime.value) {
+watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
+  regexString = new RegExp(textRegex.value, isCaseMatch.value ? "" : "i");
+  isRegexChange = true;
+  if (isRealtime.value) {
     logFilterForBtn.value();
   }
 });
 
 watch([timepicker], (): void => {
-  isChanged = true;
+  isTextareaInOrTimeChange = true;
   arrayTextareaInFilterByTime = [];
-  if (checkboxRealtime.value) {
+  if (isRealtime.value) {
     logFilterForBtn.value();
   }
 });
 
 const readerChange = (value: string): void => {
-  if (arrayTextareaInFilterByTime.length !== 0) {
+  if (arrayTextareaInFilterByTime.length === 0) {
     logFilterForBtn.value();
   }
 };
@@ -242,20 +274,20 @@ const logFilterForBtn = ref((): void => {
 }); // 过滤
 
 const logFilterForRegex = ref((e: any): void => {
-  if (e.keyCode === 13 && !checkboxRealtime.value) {
+  if (e.keyCode === 13 && !isRealtime.value) {
     logFilterForBtn.value();
   }
 }); // 过滤
 
 const logFilterWithTime = (): string[] => {
-  if (isChanged) {
+  if (isTextareaInOrTimeChange) {
     // filter date
     let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
     let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
     let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
     let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString());
     arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
-    isChanged = false;
+    isTextareaInOrTimeChange = false;
   }
   return arrayTextareaInFilterByTime;
 };
@@ -265,33 +297,39 @@ const logFilterWithRegex = (): void => {
   let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
   let isFilterFiled = (moment(timepickerStart).isValid() && moment(timepickerEnd).isValid()) || textRegex.value !== "";
   if (textareaIn.value !== "" && isFilterFiled) {
-    if (textRegex.value !== "") {
-      if (reader.value === "Markdown" || reader.value === "Table") {
-        let tempArray = arrayTextareaInFilterByTime
-            .map(s => regexString.test(s)
-                ? s.replace(regexString, (value) =>
-                    `<label style="background-color: ${colorPickerFontBackground.value}; color:${colorPickerFont.value};">${value}</label>`)
-                : null)
-            .filter(f => f !== null);
-        textareaOut.value = tempArray.join("\n");
+    if (isRegexChange) {
+      isRegexChange = false;
+      if (textRegex.value !== "") {
+        if (reader.value === "Markdown" || reader.value === "Table") {
+          let tempArray = arrayTextareaInFilterByTime
+              .filter(f => (isRegexMatch.value
+                  ? regexString.test(f) :
+                  (isCaseMatch.value
+                      ? f.includes(textRegex.value)
+                      : f.toLowerCase().includes(textRegex.value.toLowerCase()))))
+              .map(s => s.replace(isRegexMatch.value ? regexString : textRegex.value, (value) =>
+                  `<label style="background-color: ${colorPickerFontBackground.value}; color:${colorPickerFont.value};">${value}</label>`));
+          textareaOut.value = tempArray.join("\n");
 
-        tableData.value = [];
-        tempArray.forEach(f => tableData.value.push({data: f}));
+          tableData.value = [];
+          tempArray.forEach(f => tableData.value.push({data: f}));
+        } else {
+          let tempArray = arrayTextareaInFilterByTime
+              .filter(f => (isRegexMatch.value
+                  ? regexString.test(f) :
+                  (isCaseMatch.value
+                      ? f.includes(textRegex.value)
+                      : f.toLowerCase().includes(textRegex.value.toLowerCase()))));
+          textareaOut.value = tempArray.join("\n");
+
+          tableData.value = [];
+          tempArray.forEach(f => tableData.value.push({data: f}));
+        }
       } else {
-        let tempArray = arrayTextareaInFilterByTime
-            .map(s => regexString.test(s)
-                ? s
-                : null)
-            .filter(f => f !== null);
-        textareaOut.value = tempArray.join("\n");
-
+        textareaOut.value = arrayTextareaInFilterByTime.join("\n");
         tableData.value = [];
-        tempArray.forEach(f => tableData.value.push({data: f}));
+        arrayTextareaInFilterByTime.forEach(f => tableData.value.push({data: f}));
       }
-    } else {
-      textareaOut.value = arrayTextareaInFilterByTime.join("\n");
-      tableData.value = [];
-      arrayTextareaInFilterByTime.forEach(f => tableData.value.push({data: f}));
     }
   } else {
     textareaOut.value = textareaIn.value;
