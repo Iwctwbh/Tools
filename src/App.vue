@@ -237,7 +237,24 @@ watch([textareaIn], (): void => {
 });
 
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
-  regexString = new RegExp(textRegex.value, isCaseMatch.value ? "" : "i");
+  let tempText = textRegex.value;
+  if (!isRegexMatch) {
+    tempText.replace("\\", "\\\\") // 转义
+        .replace(".", "\\.")
+        .replace("*", "\\*")
+        .replace("+", "\\+")
+        .replace("?", "\\?")
+        .replace("$", "\\$")
+        .replace("^", "\\^")
+        .replace("[", "\\[")
+        .replace("]", "\\]")
+        .replace("(", "\\(")
+        .replace(")", "\\)")
+        .replace("{", "\\{")
+        .replace("}", "\\}")
+        .replace("|", "\\|");
+  }
+  regexString = new RegExp(tempText, isCaseMatch.value ? "" : "i");
   isRegexChange = true;
   if (isRealtime.value) {
     logFilterForBtn.value();
@@ -302,24 +319,15 @@ const logFilterWithRegex = (): void => {
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
           let tempArray = arrayTextareaInFilterByTime
-              .filter(f => (isRegexMatch.value
-                  ? regexString.test(f) :
-                  (isCaseMatch.value
-                      ? f.includes(textRegex.value)
-                      : f.toLowerCase().includes(textRegex.value.toLowerCase()))))
-              .map(s => s.replace(isRegexMatch.value ? regexString : textRegex.value, (value) =>
+              .filter(f => regexString.test(f))
+              .map(s => s.replace(regexString, (value) =>
                   `<label style="background-color: ${colorPickerFontBackground.value}; color:${colorPickerFont.value};">${value}</label>`));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
           tempArray.forEach(f => tableData.value.push({data: f}));
         } else {
-          let tempArray = arrayTextareaInFilterByTime
-              .filter(f => (isRegexMatch.value
-                  ? regexString.test(f) :
-                  (isCaseMatch.value
-                      ? f.includes(textRegex.value)
-                      : f.toLowerCase().includes(textRegex.value.toLowerCase()))));
+          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
