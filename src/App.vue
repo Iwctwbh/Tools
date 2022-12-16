@@ -238,8 +238,8 @@ watch([textareaIn], (): void => {
 
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
   let tempText = textRegex.value;
-  if (!isRegexMatch) {
-    tempText.replace("\\", "\\\\") // 转义
+  if (!isRegexMatch.value) {
+    tempText = tempText.replace("\\", "\\\\") // 转义
         .replace(".", "\\.")
         .replace("*", "\\*")
         .replace("+", "\\+")
