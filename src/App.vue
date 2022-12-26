@@ -168,7 +168,13 @@
   </el-row>
 </template>
 
-<style scoped>
+<style>
+@import "md-editor-v3/lib/style.css";
+
+.highlight {
+  color: v-bind(colorPickerFont);
+  background-color: v-bind(colorPickerFontBackground);
+}
 </style>
 
 <script lang='ts' setup>
@@ -176,7 +182,6 @@ import {computed, ref, watch} from "vue";
 import moment from "moment";
 import _ from "lodash";
 import MdEditor from "md-editor-v3";
-import "md-editor-v3/lib/style.css";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
@@ -204,8 +209,8 @@ const ifTimeSpend = computed<boolean>(() => {
 const ARRAY_HOURS: number[] = Array(24).fill(null).map((item, index) => index);
 const ARRAY_MINUTES: number[] = Array(60).fill(null).map((item, index) => index);
 const ARRAY_SECONDS: number[] = Array(60).fill(null).map((item, index) => index);
-const YEAR_START: string = "1969T";
-const REGEX_TIME: RegExp = /(((\d{4}[\/\-]?\d{1,2}[\/\-]?\d{1,2})|(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}))[T ])?\d{1,2}\:\d{1,2}:\d{1,2}(\.\d{1,3})?/g;
+const YEAR_START: string = "1969 ";
+const REGEX_TIME: RegExp = new RegExp(/(((\d{4}[\/\-]?\d{1,2}[\/\-]?\d{1,2})|(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})|(\d{4}))[T ])?\d{1,2}\:\d{1,2}:\d{1,2}(\.\d{1,3})?( ?[AP]M)?/i);
 
 let regexString = new RegExp("");
 let arrayTextareaIn: string[] = [];
@@ -304,7 +309,6 @@ const logFilterWithTime = (): string[] => {
     let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
     let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString());
     arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
-    isTextareaInOrTimeChange = false;
   }
   return arrayTextareaInFilterByTime;
 };
@@ -314,14 +318,15 @@ const logFilterWithRegex = (): void => {
   let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
   let isFilterFiled = (moment(timepickerStart).isValid() && moment(timepickerEnd).isValid()) || textRegex.value !== "";
   if (textareaIn.value !== "" && isFilterFiled) {
-    if (isRegexChange) {
+    if (isRegexChange || isTextareaInOrTimeChange) {
       isRegexChange = false;
+      isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
           let tempArray = arrayTextareaInFilterByTime
               .filter(f => regexString.test(f))
               .map(s => s.replace(regexString, (value) =>
-                  `<label style="background-color: ${colorPickerFontBackground.value}; color:${colorPickerFont.value};">${value}</label>`));
+                  `<label class="highlight">${value}</label>`));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
@@ -429,7 +434,7 @@ const recognitionTime = (s: string): string => {
               let value = previousValue + currentValue;
               if (value.length > 25) {
                 array.splice(1);
-              } else if (value.length > 8) {
+              } else if (value.length > 7) {
                 if (value.length > stringMoment.length && moment(value).isValid() && REGEX_TIME.test(value)) {
                   stringMoment = value;
                   indexStringMoment = i;
