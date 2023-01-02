@@ -6,12 +6,17 @@
     <el-col :span="9"></el-col>
     <el-col :offset="1" :span="4"></el-col>
     <el-col :offset="1" :span="9" style="display: flex; align-items: center;">
-      <el-radio-group v-model="reader" class="ml-4" style="padding-right: 10px" @change="readerChange">
+      <el-radio-group
+          v-model="reader"
+          class="ml-4"
+          style="padding-right: 10px; flex-wrap: nowrap;"
+          @change="readerChange"
+      >
         <el-radio label="Table" size="large">Table</el-radio>
         <el-radio label="Textarea" size="large">Textarea</el-radio>
         <el-radio label="Markdown" size="large">Markdown</el-radio>
       </el-radio-group>
-      <div v-if="reader !== 'Textarea'">
+      <div v-if="reader !== 'Textarea'" style="white-space: nowrap;">
         <span class="demonstration">高亮字体颜色</span>
         <el-color-picker v-model="colorPickerFont"/>
         &nbsp;
@@ -36,8 +41,8 @@
         本项目开源: <a href="https://github.com/Iwctwbh/LogFilter">https://github.com/Iwctwbh/LogFilter</a>
       </p>
     </el-col>
-    <el-col :offset="1" :span="4">
-      <div style="padding-bottom: 10px">
+    <el-col :span="5" style="margin: 0 auto;">
+      <div style="padding-bottom: 10px; width: 100%; display: inline-flex;">
         <el-time-picker
             v-if="isOneDay"
             v-model="timepicker"
@@ -125,11 +130,7 @@
         </el-button>
       </div>
     </el-col>
-    <el-col
-        :offset="1"
-        :span="9"
-        style="display: flex; flex-direction: column;"
-    >
+    <el-col :span="9" style="display: flex; flex-direction: column;">
       <el-table
           v-if="reader === 'Table'"
           :data="tableData"
@@ -139,7 +140,8 @@
         <el-table-column
             v-slot="scope"
             label="Data"
-            prop="data">
+            prop="data"
+        >
           <div v-html="scope.row.data"></div>
         </el-table-column>
       </el-table>
@@ -175,6 +177,8 @@
   color: v-bind(colorPickerFont);
   background-color: v-bind(colorPickerFontBackground);
 }
+
+
 </style>
 
 <script lang='ts' setup>
@@ -474,7 +478,7 @@ const FilterByBreakLine = (): void => {
   arrayTextareaIn.forEach((v, i) => {
     if (recognitionTimeCheck(v)) {
       tempArray.push(v);
-    } else {
+    } else if (tempArray.length > 1) {
       tempArray[tempArray.length - 1] = tempArray[tempArray.length - 1].concat("\r\n").concat(v);
     }
   });
