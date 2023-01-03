@@ -1,10 +1,20 @@
+# 日志过滤 LogFilter
+
+自动识别日期时间，可按时间过滤或正则过滤。
+Automatically recognize date and time, can filter by time or regular expression.
+
+有bug可提issue，或者直接联系我。
+If you find bug, please mention the issue or contact me directly.
+
 # Vue 3 + TypeScript + Vite
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue
+3 `<script setup>` SFCs, check out
+the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
 ## Recommended IDE Setup
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+- [Webstorm](https://www.jetbrains.com/webstorm/)
 
 ## Type Support For `.vue` Imports in TS
 
