@@ -3,7 +3,7 @@
     过滤Log
   </h1>
   <el-row>
-    <el-col :lg="9">
+    <el-col :lg="9" class="paddingTop40px">
       <el-input
           id="textareaIn"
           v-model="textareaIn"
@@ -18,7 +18,7 @@
         本项目开源: <a href="https://github.com/Iwctwbh/LogFilter">https://github.com/Iwctwbh/LogFilter</a>
       </p>
     </el-col>
-    <el-col :lg="5" style="margin: 0 auto;">
+    <el-col :lg="5" class="paddingTop40px" style="margin: 0 auto;">
       <div style="padding-bottom: 10px; width: 100%; display: inline-flex;">
         <el-time-picker
             v-if="isOneDay"
@@ -80,7 +80,7 @@
               v-model="isRealtime"
               border
               class="tools"
-              style="margin-right: 0px"
+              style="margin-right: 0"
               title="实时过滤"
           >
             <strong>
@@ -111,25 +111,29 @@
       </div>
     </el-col>
     <el-col :lg="9" style="display: flex; align-items: center; flex-direction: column;">
-      <div style="display: flex; align-items: center;">
-        <el-radio-group
-            v-model="reader"
-            class="ml-4"
-            style="padding-right: 10px; flex-wrap: nowrap;"
-            @change="readerChange"
-        >
-          <el-radio label="Table" size="large">Table</el-radio>
-          <el-radio label="Textarea" size="large">Textarea</el-radio>
-          <el-radio label="Markdown" size="large">Markdown</el-radio>
-        </el-radio-group>
-        <div v-if="reader !== 'Textarea'" style="white-space: nowrap;">
-          <span class="demonstration">高亮字体颜色</span>
-          <el-color-picker v-model="colorPickerFont"/>
-          &nbsp;
-          <span class="demonstration">高亮字体背景颜色</span>
-          <el-color-picker v-model="colorPickerFontBackground"/>
-        </div>
-      </div>
+      <el-row style="align-items: center; width: 100%;">
+        <el-col :xl="12">
+          <el-radio-group
+              v-model="reader"
+              class="ml-4"
+              style="padding-right: 10px; flex-wrap: nowrap;"
+              @change="readerChange"
+          >
+            <el-radio label="Table" size="large">Table</el-radio>
+            <el-radio label="Textarea" size="large">Textarea</el-radio>
+            <el-radio label="Markdown" size="large">Markdown</el-radio>
+          </el-radio-group>
+        </el-col>
+        <el-col :xl="12">
+          <div v-if="reader !== 'Textarea'" style="white-space: nowrap;">
+            <span class="demonstration">高亮字体颜色</span>
+            <el-color-picker v-model="colorPickerFont"/>
+            &nbsp;
+            <span class="demonstration">高亮字体背景颜色</span>
+            <el-color-picker v-model="colorPickerFontBackground"/>
+          </div>
+        </el-col>
+      </el-row>
       <el-table
           v-if="reader === 'Table'"
           :data="tableData"
@@ -145,26 +149,23 @@
         </el-table-column>
       </el-table>
       <el-input
+          id="textareaOut"
           v-if="reader === 'Textarea'"
           v-model="textareaOut"
-          :autosize="{ minRows: 15, maxRows: 30 }"
+          :autosize="{ minRows: 15 }"
           readonly
           type="textarea"
+          style="flex: 1;"
       />
       <md-editor
           v-if="reader === 'Markdown'"
           v-model="textareaOut"
           style="flex: 1;"
       ></md-editor>
-      <div style="display: flex; float: right">
-        <p v-if="ifTimeSpend">
-          用时：
-        </p>
-        <p>
-          {{ timeSpend }}
-        </p>
-      </div>
-      <p>&nbsp;</p>
+      <p v-if="ifTimeSpend" style="width: 100%;">
+        用时：{{ timeSpend }}
+      </p>
+      <p style="margin-top: 0;">&nbsp;</p>
     </el-col>
   </el-row>
 </template>
@@ -210,7 +211,15 @@
   background-color: v-bind(colorPickerFontBackground);
 }
 
+#app #textareaOut {
+  height: 100% !important;
+}
 
+@media only screen and (min-width: 1200px) {
+  #app .paddingTop40px {
+    padding-top: 40px;
+  }
+}
 </style>
 
 <script lang='ts' setup>
@@ -317,7 +326,7 @@ watch([timepicker], (): void => {
 // Function
 
 // 阅读器更改事件
-const readerChange = (value: string): void => {
+const readerChange = (): void => {
   if (arrayTextareaInFilterByTime.length === 0) {
     logFilterForBtn.value();
   }
@@ -519,7 +528,7 @@ const recognitionTimeCheck = (s: string): boolean => {
 // 识别并合并换行
 const FilterByBreakLine = (): void => {
   const tempArray: string[] = [];
-  arrayTextareaIn.forEach((v, i) => {
+  arrayTextareaIn.forEach((v) => {
     if (recognitionTimeCheck(v)) {
       tempArray.push(v);
     } else if (tempArray.length > 1) {
