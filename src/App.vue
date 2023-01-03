@@ -416,7 +416,7 @@ const logFilterWithRegex = (): void => {
           tempArray.forEach(f => tableData.value.push({data: f}));
         } else {
           let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
-              .map(s => s.replaceAll("  ", "&nbsp;"));
+              .map(s => s.replaceAll("  ", "&nbsp;&nbsp;"));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
