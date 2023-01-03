@@ -3,13 +3,25 @@
     过滤Log
   </h1>
   <el-row>
-    <el-col :lg="9" class="paddingTop40px">
+    <el-col :lg="9">
+      <el-checkbox
+          v-model="isAutoBreakLine"
+          border
+          class="tools"
+          style="margin-bottom: 8px;"
+          title="自动换行"
+      >
+        <strong style="font-size: 20px;">
+          自动换行
+        </strong>
+      </el-checkbox>
       <el-input
           id="textareaIn"
           v-model="textareaIn"
           :autosize="{ minRows: 15, maxRows: 30 }"
           placeholder="Please input text"
           type="textarea"
+          :class="!isAutoBreakLine ? 'noWrap' : ''"
       />
       <p>
         作者: <a href="https://github.com/Iwctwbh">Iwctwbh</a>
@@ -117,7 +129,7 @@
               v-model="reader"
               class="ml-4"
               style="padding-right: 10px; flex-wrap: nowrap;"
-              @change="readerChange"
+              @change="changeReader"
           >
             <el-radio label="Table" size="large">Table</el-radio>
             <el-radio label="Textarea" size="large">Textarea</el-radio>
@@ -215,6 +227,10 @@
   height: 100% !important;
 }
 
+#app .noWrap textarea {
+  white-space: nowrap;
+}
+
 @media only screen and (min-width: 1200px) {
   #app .paddingTop40px {
     padding-top: 40px;
@@ -246,6 +262,7 @@ const reader = ref<string>("Table");
 const tableData = ref<any[]>([]);
 const isCaseMatch = ref<boolean>(false);
 const isRegexMatch = ref<boolean>(false);
+const isAutoBreakLine = ref<boolean>(true);
 
 const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
@@ -275,6 +292,8 @@ let isRegexChange: boolean = true;
 let isOnlyTime: boolean = false;
 let recognitionTimeStart: number = 0;
 let recognitionTimeEnd: number = 0;
+let oldReader: string = "Table";
+let readerChange: boolean = false;
 
 // Event
 
@@ -326,10 +345,19 @@ watch([timepicker], (): void => {
 // Function
 
 // 阅读器更改事件
-const readerChange = (): void => {
-  if (arrayTextareaInFilterByTime.length === 0) {
-    logFilterForBtn.value();
+const changeReader = (): void => {
+  const mapHierarchy: Record<string, number> = {
+    "Table": 0,
+    "Textarea": 1,
+    "Markdown": 0
+  };
+  if (mapHierarchy[reader.value] !== mapHierarchy[oldReader]) {
+    readerChange = true;
+  } else {
+    readerChange = false;
   }
+  oldReader = reader.value;
+  logFilterForBtn.value();
 }; // 阅读器更改事件
 
 // 过滤按钮事件
@@ -373,20 +401,22 @@ const logFilterWithRegex = (): void => {
   let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
   let isFilterFiled = (moment(timepickerStart).isValid() && moment(timepickerEnd).isValid()) || textRegex.value !== "";
   if (textareaIn.value !== "" && isFilterFiled) {
-    if (isRegexChange || isTextareaInOrTimeChange) {
+    if (isRegexChange || isTextareaInOrTimeChange || readerChange) {
       isRegexChange = false;
       isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
           let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
               .map(s => s.replace(regexString, (value) =>
-                  `<label class="highlight">${value}</label>`));
+                  `<label class="highlight">${value}</label>`)
+                  .replaceAll("  ", "&nbsp;&nbsp;"));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
           tempArray.forEach(f => tableData.value.push({data: f}));
         } else {
-          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
+          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
+              .map(s => s.replaceAll("  ", "&nbsp;"));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
