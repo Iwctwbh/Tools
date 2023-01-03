@@ -3,36 +3,13 @@
     过滤Log
   </h1>
   <el-row>
-    <el-col :span="9"></el-col>
-    <el-col :offset="1" :span="4"></el-col>
-    <el-col :offset="1" :span="9" style="display: flex; align-items: center;">
-      <el-radio-group
-          v-model="reader"
-          class="ml-4"
-          style="padding-right: 10px; flex-wrap: nowrap;"
-          @change="readerChange"
-      >
-        <el-radio label="Table" size="large">Table</el-radio>
-        <el-radio label="Textarea" size="large">Textarea</el-radio>
-        <el-radio label="Markdown" size="large">Markdown</el-radio>
-      </el-radio-group>
-      <div v-if="reader !== 'Textarea'" style="white-space: nowrap;">
-        <span class="demonstration">高亮字体颜色</span>
-        <el-color-picker v-model="colorPickerFont"/>
-        &nbsp;
-        <span class="demonstration">高亮字体背景颜色</span>
-        <el-color-picker v-model="colorPickerFontBackground"/>
-      </div>
-    </el-col>
-  </el-row>
-  <el-row>
-    <el-col :span="9">
+    <el-col :lg="9">
       <el-input
           id="textareaIn"
           v-model="textareaIn"
           :autosize="{ minRows: 15, maxRows: 30 }"
-          type="textarea"
           placeholder="Please input text"
+          type="textarea"
       />
       <p>
         作者: <a href="https://github.com/Iwctwbh">Iwctwbh</a>
@@ -41,7 +18,7 @@
         本项目开源: <a href="https://github.com/Iwctwbh/LogFilter">https://github.com/Iwctwbh/LogFilter</a>
       </p>
     </el-col>
-    <el-col :span="5" style="margin: 0 auto;">
+    <el-col :lg="5" style="margin: 0 auto;">
       <div style="padding-bottom: 10px; width: 100%; display: inline-flex;">
         <el-time-picker
             v-if="isOneDay"
@@ -71,55 +48,58 @@
       </div>
       <el-input
           v-model="textRegex"
-          type="text"
           placeholder="Please input regex"
-          @keyup="logFilterForRegex"
           style="padding-bottom: 10px;"
+          type="text"
+          @keyup="logFilterForRegex"
       />
       <div style="display: flex; justify-content: space-between;">
-        <el-checkbox
-            v-model="isCaseMatch"
-            border
-            class="tools"
-            title="区分大小写"
-        >
-          <strong style="font-size: 16px">
-            Aa
-          </strong>
-        </el-checkbox>
-
-        <el-checkbox
-            v-model="isRegexMatch"
-            border
-            class="tools"
-            title="正则表达式"
-        >
-          <strong style="font-size: 20px;">
-            .*
-          </strong>
-        </el-checkbox>
-
-        <el-checkbox
-            v-model="isRealtime"
-            border
-            class="tools"
-            style="margin-right: 0px"
-            title="实时过滤"
-        >
-          <strong>
-            实时
-          </strong>
-          <el-tooltip
-              class="box-item"
-              content="性能堪忧"
-              effect="dark"
-              placement="bottom"
+        <div style="display: flex; justify-content: space-between; width: 200px;">
+          <el-checkbox
+              v-model="isCaseMatch"
+              border
+              class="tools"
+              title="区分大小写"
           >
-            <el-icon>
-              <QuestionFilled/>
-            </el-icon>
-          </el-tooltip>
-        </el-checkbox>
+            <strong style="font-size: 16px">
+              Aa
+            </strong>
+          </el-checkbox>
+          <el-checkbox
+              v-model="isRegexMatch"
+              border
+              class="tools"
+              title="正则表达式"
+          >
+            <strong style="font-size: 20px;">
+              .*
+            </strong>
+          </el-checkbox>
+
+          <el-checkbox
+              v-model="isRealtime"
+              border
+              class="tools"
+              style="margin-right: 0px"
+              title="实时过滤"
+          >
+            <strong>
+              实时
+            </strong>
+            <el-tooltip
+                class="box-item"
+                content="性能堪忧"
+                effect="dark"
+                placement="bottom"
+            >
+              <el-icon>
+                <QuestionFilled/>
+              </el-icon>
+            </el-tooltip>
+          </el-checkbox>
+        </div>
+        <div style="flex: 1;"></div>
+
         <el-button
             :disabled="isRealtime"
             :loading="isLoading"
@@ -130,7 +110,26 @@
         </el-button>
       </div>
     </el-col>
-    <el-col :span="9" style="display: flex; flex-direction: column;">
+    <el-col :lg="9" style="display: flex; align-items: center; flex-direction: column;">
+      <div style="display: flex; align-items: center;">
+        <el-radio-group
+            v-model="reader"
+            class="ml-4"
+            style="padding-right: 10px; flex-wrap: nowrap;"
+            @change="readerChange"
+        >
+          <el-radio label="Table" size="large">Table</el-radio>
+          <el-radio label="Textarea" size="large">Textarea</el-radio>
+          <el-radio label="Markdown" size="large">Markdown</el-radio>
+        </el-radio-group>
+        <div v-if="reader !== 'Textarea'" style="white-space: nowrap;">
+          <span class="demonstration">高亮字体颜色</span>
+          <el-color-picker v-model="colorPickerFont"/>
+          &nbsp;
+          <span class="demonstration">高亮字体背景颜色</span>
+          <el-color-picker v-model="colorPickerFontBackground"/>
+        </div>
+      </div>
       <el-table
           v-if="reader === 'Table'"
           :data="tableData"
@@ -149,8 +148,8 @@
           v-if="reader === 'Textarea'"
           v-model="textareaOut"
           :autosize="{ minRows: 15, maxRows: 30 }"
-          type="textarea"
           readonly
+          type="textarea"
       />
       <md-editor
           v-if="reader === 'Markdown'"
@@ -173,7 +172,40 @@
 <style>
 @import "md-editor-v3/lib/style.css";
 
-.highlight {
+#app {
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+#app .el-date-editor.el-input, #app .el-date-editor.el-input__wrapper {
+  width: auto;
+}
+
+#app .md-editor-toolbar-wrapper, #app .md-editor-footer, #app .md-editor-input-wrapper {
+  display: none;
+}
+
+#app #textareaIn {
+  max-height: 625px;
+}
+
+#app #md-editor-v3 {
+  max-height: 625px;
+}
+
+#app #md-editor-v3-preview {
+  padding: 5px 11px;
+}
+
+#app .tools {
+  margin: 0px;
+}
+
+#app .tools .el-checkbox__inner {
+  display: none;
+}
+
+#app .highlight {
   color: v-bind(colorPickerFont);
   background-color: v-bind(colorPickerFontBackground);
 }
@@ -236,6 +268,8 @@ let recognitionTimeStart: number = 0;
 let recognitionTimeEnd: number = 0;
 
 // Event
+
+// 监听输入框
 watch([textareaIn], (): void => {
   mappingData();
   isTextareaInOrTimeChange = true;
@@ -243,8 +277,9 @@ watch([textareaIn], (): void => {
   if (isRealtime.value) {
     logFilterForBtn.value();
   }
-});
+}); // 监听输入框
 
+// 监听选项
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
   let tempText = textRegex.value;
   if (!isRegexMatch.value) {
@@ -268,23 +303,27 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
   if (isRealtime.value) {
     logFilterForBtn.value();
   }
-});
+}); // 监听选项
 
+// 监听timepicker
 watch([timepicker], (): void => {
   isTextareaInOrTimeChange = true;
   arrayTextareaInFilterByTime = [];
   if (isRealtime.value) {
     logFilterForBtn.value();
   }
-});
+}); // 监听timepicker
 
+// Function
+
+// 阅读器更改事件
 const readerChange = (value: string): void => {
   if (arrayTextareaInFilterByTime.length === 0) {
     logFilterForBtn.value();
   }
-};
+}; // 阅读器更改事件
 
-// Function
+// 过滤按钮事件
 const logFilterForBtn = ref((): void => {
   let dateTime: Date = new Date();
   new Promise<void>((resolve) => {
@@ -297,14 +336,16 @@ const logFilterForBtn = ref((): void => {
     logFilterWithRegex();
     timeSpend.value = moment((new Date().getTime() - dateTime.getTime())).format("mm:ss:SSS");
   });
-}); // 过滤
+}); // 过滤按钮事件
 
+// 正则过滤
 const logFilterForRegex = ref((e: any): void => {
   if (e.keyCode === 13 && !isRealtime.value) {
     logFilterForBtn.value();
   }
-}); // 过滤
+}); // 正则过滤
 
+// 二分过滤时间
 const logFilterWithTime = (): string[] => {
   if (isTextareaInOrTimeChange) {
     // filter date
@@ -315,8 +356,9 @@ const logFilterWithTime = (): string[] => {
     arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
   }
   return arrayTextareaInFilterByTime;
-};
+}; // 二分过滤时间
 
+// 过滤
 const logFilterWithRegex = (): void => {
   logFilterWithTime();
   let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
@@ -327,8 +369,7 @@ const logFilterWithRegex = (): void => {
       isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
-          let tempArray = arrayTextareaInFilterByTime
-              .filter(f => regexString.test(f))
+          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
               .map(s => s.replace(regexString, (value) =>
                   `<label class="highlight">${value}</label>`));
           textareaOut.value = tempArray.join("\n");
@@ -366,7 +407,7 @@ const binarySearchMax = (array: string[], x: string): number => {
     }
   }
   return right;
-};
+}; // 二分查找arrayTextareaIn中不大于x的最大值
 
 // 二分查找arrayTextareaIn中不小x的最小值
 const binarySearchMin = (array: string[], x: string): number => {
@@ -380,7 +421,7 @@ const binarySearchMin = (array: string[], x: string): number => {
     }
   }
   return left;
-};
+}; // 二分查找arrayTextareaIn中不小x的最小值
 
 const mappingData = (): void => {
   arrayTextareaIn = textareaIn.value
@@ -425,6 +466,7 @@ const mappingData = (): void => {
   }
 }; // 映射数据
 
+// 获取时间
 const recognitionTime = (s: string): string => {
   let stringMoment: string = "";
   let stringMomentOnlyTime: string = "";
@@ -465,16 +507,18 @@ const recognitionTime = (s: string): string => {
       : YEAR_START.concat(stringMomentOnlyTime);
 }; // 获取时间
 
+// 校对时间
 const recognitionTimeCheck = (s: string): boolean => {
   if (isOnlyTime) {
     return moment(YEAR_START.concat(s.slice(recognitionTimeStart, recognitionTimeEnd))).isValid() && REGEX_TIME.test(YEAR_START.concat(s.slice(recognitionTimeStart, recognitionTimeEnd)));
   } else {
     return moment(s.slice(recognitionTimeStart, recognitionTimeEnd)).isValid() && REGEX_TIME.test(s.slice(recognitionTimeStart, recognitionTimeEnd));
   }
-};
+}; // 校对时间
 
+// 识别并合并换行
 const FilterByBreakLine = (): void => {
-  var tempArray: string[] = [];
+  const tempArray: string[] = [];
   arrayTextareaIn.forEach((v, i) => {
     if (recognitionTimeCheck(v)) {
       tempArray.push(v);
@@ -483,18 +527,20 @@ const FilterByBreakLine = (): void => {
     }
   });
   arrayTextareaIn = tempArray;
-}; // FilterByBreakLine
+}; // 识别并合并换行
 
-// TimePicker
+// 日期选择器更改
 const calendarChange = ref((array: [Date, Date]): void => {
   arrayDatepicker = array;
-}); // 日期选择器
+}); // 日期选择器更改
 
+// 禁用日期
 const disabledDates = ref((date: Date): boolean => {
   return moment(date).isBefore(_.first(datepicker.value), "date")
       || moment(date).isAfter(_.last(datepicker.value), "date");
-}); // 日期不可选
+}); // 禁用日期
 
+// 禁用小时
 const disabledHours = ref((pos_datepicker: string): number[] => {
   const momentDateStart = moment(dateStart).startOf("date");
   const momentDateEnd = moment(dateEnd).startOf("date");
@@ -519,8 +565,9 @@ const disabledHours = ref((pos_datepicker: string): number[] => {
     }
     return arrayEndDisabledHours;
   }
-}); // end disabledHours
+}); // 禁用小时
 
+// 禁用分钟
 const disabledMinutes = ref((hour: number): number[] => {
   let arrayDisabledMinutes: number[] = [];
   if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
@@ -536,8 +583,9 @@ const disabledMinutes = ref((hour: number): number[] => {
     arrayDisabledMinutes = arrayDisabledMinutes.concat(arrayDisabledMinutesEnd);
   }
   return arrayDisabledMinutes;
-}); // end disabledMinutes
+}); // 禁用分钟
 
+// 禁用秒
 const disabledSeconds = ref((hour: number, minute: number): number[] => {
   let arrayDisabledSeconds: number[] = [];
   if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
@@ -555,16 +603,18 @@ const disabledSeconds = ref((hour: number, minute: number): number[] => {
     arrayDisabledSeconds = arrayDisabledSeconds.concat(arrayDisabledSecondsEnd);
   }
   return arrayDisabledSeconds;
-}); // end disabledSeconds
+}); // 禁用秒
 
+// 得到范围内的时间
 const makeRange = (start: number, end: number): number[] => {
   const result: number[] = [];
   for (let i = start; i <= end; i++) {
     result.push(i);
   }
   return result;
-}; // end makeRange
+}; // 得到范围内的时间
 
+// 仅比较时间
 const compareOnlyTime = (time1: any, time2: any): number => {
   if (time1.hour() > time2.hour()) {
     return 1;
@@ -581,5 +631,5 @@ const compareOnlyTime = (time1: any, time2: any): number => {
   } else {
     return 0;
   }
-}; // end CompareOnlyTime
+}; // 仅比较时间
 </script>
