@@ -60,10 +60,13 @@
         />
       </div>
       <p>
-        作者: <a href="https://github.com/Iwctwbh">Iwctwbh</a>
+        作者: <a href="https://github.com/Iwctwbh" target="_blank">Iwctwbh</a>
       </p>
       <p>
-        本项目开源: <a href="https://github.com/Iwctwbh/LogFilter">https://github.com/Iwctwbh/LogFilter</a>
+        本项目开源:
+        <a href="https://github.com/Iwctwbh/LogFilter" target="_blank">
+          https://github.com/Iwctwbh/LogFilter
+        </a>
       </p>
     </el-col>
     <el-col :lg="5" class="paddingTop40px" style="margin: 0 auto;">
