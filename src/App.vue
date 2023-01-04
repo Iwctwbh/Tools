@@ -15,14 +15,50 @@
           自动换行
         </strong>
       </el-checkbox>
-      <el-input
-          id="textareaIn"
-          v-model="textareaIn"
-          :autosize="{ minRows: 15, maxRows: 30 }"
-          placeholder="Please input text"
-          type="textarea"
-          :class="!isAutoBreakLine ? 'noWrap' : ''"
-      />
+      <!--      <el-upload-->
+      <!--          action="none"-->
+      <!--          :file-list="fileList"-->
+      <!--          :auto-upload="false"-->
+      <!--          :before-upload="beforeUpload"-->
+      <!--          :on-change="setUploadData"-->
+      <!--          multiple-->
+      <!--          accept=".txt"-->
+      <!--      >-->
+      <!--        <el-button size="small" type="primary">点击上传</el-button>-->
+      <!--        <div slot="tip" class="el-upload__tip">只能上传txt文件</div>-->
+      <!--      </el-upload>-->
+      <div style="position: relative">
+        <el-upload
+            id="upload"
+            :auto-upload="false"
+            :class="isPointerEventsNone ? 'pointer-events-none' : ''"
+            :file-list="fileList"
+            :on-change="uploadChange"
+            accept=".txt"
+            action="none"
+            drag
+            multiple
+            style="position: absolute; opacity: 0.3; z-index: 1; height: 100%; width: 100%;"
+            @mouseenter="uploadMouseEnter"
+        >
+          <el-icon class="el-icon--upload">
+            <upload-filled/>
+          </el-icon>
+          <div class="el-upload__text">
+            Drop file here
+          </div>
+        </el-upload>
+
+        <el-input
+            id="textareaIn"
+            v-model="textareaIn"
+            :autosize="{ minRows: 15, maxRows: 30 }"
+            :class="!isAutoBreakLine ? 'noWrap' : ''"
+            placeholder="Please input text"
+            type="textarea"
+            @mouseleave="textareaMouseLeave"
+        />
+      </div>
       <p>
         作者: <a href="https://github.com/Iwctwbh">Iwctwbh</a>
       </p>
@@ -231,6 +267,22 @@
   white-space: nowrap;
 }
 
+#app #upload .el-upload.el-upload--text.is-drag {
+  height: 100%;
+}
+
+#app #upload .el-upload-dragger {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+#app #upload.pointer-events-none {
+  pointer-events: none;
+}
+
 @media only screen and (min-width: 1200px) {
   #app .paddingTop40px {
     padding-top: 40px;
@@ -263,6 +315,8 @@ const tableData = ref<any[]>([]);
 const isCaseMatch = ref<boolean>(false);
 const isRegexMatch = ref<boolean>(false);
 const isAutoBreakLine = ref<boolean>(true);
+const isPointerEventsNone = ref<boolean>(false);
+const fileList = ref<any[]>([]);
 
 const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
@@ -294,6 +348,7 @@ let recognitionTimeStart: number = 0;
 let recognitionTimeEnd: number = 0;
 let oldReader: string = "Table";
 let readerChange: boolean = false;
+let isUploadChange: boolean = false;
 
 // Event
 
@@ -343,6 +398,33 @@ watch([timepicker], (): void => {
 }); // 监听timepicker
 
 // Function
+
+// uploadMouseEnter
+const uploadMouseEnter = (e: any): void => {
+  isPointerEventsNone.value = true;
+  isUploadChange = true;
+}; // uploadMouseEnter
+
+// textareaMouseLeave
+const textareaMouseLeave = (e: any): void => {
+  isPointerEventsNone.value = false;
+  isUploadChange = false;
+}; // textareaMouseLeave
+
+// uploadChange
+const uploadChange = (res: Record<string, any>, file: any): void => {
+  if (res) {
+    textareaIn.value = "";
+    var reader = new FileReader();
+    reader.readAsText(res.raw);
+    reader.onload = (e) => {
+      if (isUploadChange) {
+        textareaIn.value += reader.result as string;
+      }
+    };
+  }
+  fileList.value = [];
+}; // uploadChange
 
 // 阅读器更改事件
 const changeReader = (): void => {
