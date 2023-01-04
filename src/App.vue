@@ -34,7 +34,7 @@
             :class="isPointerEventsNone ? 'pointer-events-none' : ''"
             :file-list="fileList"
             :on-change="uploadChange"
-            accept=".txt"
+            accept=".txt, .log"
             action="none"
             drag
             multiple
@@ -45,7 +45,7 @@
             <upload-filled/>
           </el-icon>
           <div class="el-upload__text">
-            Drop file here
+            Drop file here(.txt, .log)
           </div>
         </el-upload>
 
@@ -420,6 +420,8 @@ const uploadChange = (res: Record<string, any>, file: any): void => {
     reader.onload = (e) => {
       if (isUploadChange) {
         textareaIn.value += reader.result as string;
+      } else {
+        textareaIn.value = reader.result as string;
       }
     };
   }
