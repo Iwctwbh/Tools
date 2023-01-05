@@ -247,7 +247,7 @@
       />
       <md-editor
           v-if="reader === 'Markdown'"
-          v-model="textareaOut"
+          v-model="markdownOut"
           style="flex: 1; min-height: 325px;"
       ></md-editor>
       <p v-if="ifTimeSpend" style="width: 100%;">
@@ -347,6 +347,7 @@ const textRegex = ref<string>("");
 const isRealtime = ref<boolean>(false);
 const isFilterLoading = ref<boolean>(false);
 const textareaOut = ref<string>("");
+const markdownOut = ref<string>("");
 const datepicker = ref<[Date, Date]>();
 const timepicker = ref<[Date, Date]>();
 const defaultTime = ref<[Date, Date]>();
@@ -376,6 +377,11 @@ const ARRAY_MINUTES: number[] = Array(60).fill(null).map((item, index) => index)
 const ARRAY_SECONDS: number[] = Array(60).fill(null).map((item, index) => index);
 const YEAR_START: string = "1969 ";
 const REGEX_TIME: RegExp = new RegExp(/(((\d{4}[\/\-]?\d{1,2}[\/\-]?\d{1,2})|(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})|(\d{4}))[T ])?\d{1,2}\:\d{1,2}:\d{1,2}(\.\d{1,3})?( ?[AP]M)?/i);
+const mapHierarchy: Record<string, number> = {
+  "Table": 0,
+  "Textarea": 1,
+  "Markdown": 2
+};
 
 let regexString = new RegExp("");
 let arrayTextareaIn: string[] = [];
@@ -515,9 +521,17 @@ const btnResultStillShowClick = (): void => {
       resolve();
     }, 50);
   }).then(() => {
-    textareaOut.value = arrayTempResult.join("\n");
-    tableData.value = [];
-    arrayTempResult.forEach(f => tableData.value.push({data: f}));
+    switch (reader.value) {
+      case "Markdown":
+        markdownOut.value = arrayTempResult.join("\n");
+        break;
+      case "Table":
+        arrayTempResult.forEach(f => tableData.value.push({data: f}));
+        break;
+      case "Textarea":
+        textareaOut.value = arrayTempResult.join("\n");
+        break;
+    }
     isResultTooBig.value = false;
     isResultLoading.value = false;
   });
@@ -525,11 +539,6 @@ const btnResultStillShowClick = (): void => {
 
 // 阅读器更改事件
 const changeReader = (): void => {
-  const mapHierarchy: Record<string, number> = {
-    "Table": 0,
-    "Textarea": 1,
-    "Markdown": 0
-  };
   if (mapHierarchy[reader.value] !== mapHierarchy[oldReader]) {
     readerChange = true;
   } else {
@@ -591,10 +600,6 @@ const logFilterWithRegex = (): void => {
         } else {
           arrayTempResult = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
         }
-        textareaOut.value = arrayTempResult.join("\n");
-
-        tableData.value = [];
-        arrayTempResult.forEach(f => tableData.value.push({data: f}));
       } else {
         if (reader.value === "Markdown" || reader.value === "Table") {
           arrayTempResult = arrayTextareaInFilterByTime
@@ -606,16 +611,44 @@ const logFilterWithRegex = (): void => {
       if (arrayTempResult.length > 9999) {
         isResultTooBig.value = true;
         textareaOut.value = "";
+        markdownOut.value = "";
+        tableData.value = [];
       } else {
         isResultTooBig.value = false;
-        textareaOut.value = arrayTempResult.join("\n");
-
-        tableData.value = [];
-        arrayTempResult.forEach(f => tableData.value.push({data: f}));
+        switch (reader.value) {
+          case "Markdown":
+            markdownOut.value = arrayTempResult.join("\n");
+            break;
+          case "Table":
+            arrayTempResult.forEach(f => tableData.value.push({data: f}));
+            break;
+          case "Textarea":
+            textareaOut.value = arrayTempResult.join("\n");
+            break;
+        }
       }
     }
   } else {
-    textareaOut.value = arrayTextareaIn.join("\n");
+    arrayTempResult = arrayTextareaIn;
+    if (arrayTempResult.length > 9999) {
+      isResultTooBig.value = true;
+      textareaOut.value = "";
+      markdownOut.value = "";
+      tableData.value = [];
+    } else {
+      isResultTooBig.value = false;
+      switch (reader.value) {
+        case "Markdown":
+          markdownOut.value = arrayTempResult.join("\n");
+          break;
+        case "Table":
+          arrayTempResult.forEach(f => tableData.value.push({data: f}));
+          break;
+        case "Textarea":
+          textareaOut.value = arrayTempResult.join("\n");
+          break;
+      }
+    }
   }
   isFilterLoading.value = false;
 }; // 过滤
