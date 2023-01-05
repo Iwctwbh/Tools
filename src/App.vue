@@ -27,7 +27,15 @@
       <!--        <el-button size="small" type="primary">点击上传</el-button>-->
       <!--        <div slot="tip" class="el-upload__tip">只能上传txt文件</div>-->
       <!--      </el-upload>-->
-      <div style="position: relative">
+      <div style="position: relative; display: flex; justify-content: center;;">
+        <el-button
+            v-if="isFileTooBig"
+            :loading="isFileLoading"
+            style="position: absolute; z-index: 2; top: 70%;"
+            @click="btnFileStillShowClick"
+        >
+          仍要显示 Still Show
+        </el-button>
         <el-upload
             id="upload"
             :auto-upload="false"
@@ -45,7 +53,9 @@
             <upload-filled/>
           </el-icon>
           <div class="el-upload__text">
-            Drop file here(.txt, .log)
+            {{
+              isFileTooBig ? "文件过大，不予显示 The file is too large to be displayed" : "将文件拖到此处 Drop file here (.txt, .log)"
+            }}
           </div>
         </el-upload>
 
@@ -153,7 +163,7 @@
 
         <el-button
             :disabled="isRealtime"
-            :loading="isLoading"
+            :loading="isFilterLoading"
             type="primary"
             @click="logFilterForBtn"
         >
@@ -161,8 +171,8 @@
         </el-button>
       </div>
     </el-col>
-    <el-col :lg="9" style="display: flex; align-items: center; flex-direction: column;">
-      <el-row style="align-items: center; width: 100%;">
+    <el-col :lg="9" style="display: flex; align-items: center; flex-direction: column; position: relative;">
+      <el-row style="align-items: flex-start; width: 100%;">
         <el-col :xl="12">
           <el-radio-group
               v-model="reader"
@@ -175,7 +185,7 @@
             <el-radio label="Markdown" size="large">Markdown</el-radio>
           </el-radio-group>
         </el-col>
-        <el-col :xl="12">
+        <el-col :xl="12" style="margin-bottom: 8px;">
           <div v-if="reader !== 'Textarea'" style="white-space: nowrap;">
             <span class="demonstration">高亮字体颜色</span>
             <el-color-picker v-model="colorPickerFont"/>
@@ -196,12 +206,26 @@
           </el-checkbox>
         </el-col>
       </el-row>
+      <label
+          v-if="isResultTooBig"
+          style="position: absolute; z-index: 2; top: 40%;"
+      >
+        结果过大不予显示
+      </label>
+      <el-button
+          v-if="isResultTooBig"
+          :loading="isResultLoading"
+          style="position: absolute; z-index: 2; top: 50%;"
+          @click="btnResultStillShowClick"
+      >
+        仍要显示 Still Show
+      </el-button>
       <el-table
           id="tableOut"
           v-if="reader === 'Table'"
           :data="tableData"
           :show-header="false"
-          style="max-height: 625px;"
+          style="max-height: 625px; min-height: 325px;"
       >
         <el-table-column
             v-slot="scope"
@@ -224,7 +248,7 @@
       <md-editor
           v-if="reader === 'Markdown'"
           v-model="textareaOut"
-          style="flex: 1;"
+          style="flex: 1; min-height: 325px;"
       ></md-editor>
       <p v-if="ifTimeSpend" style="width: 100%;">
         用时：{{ timeSpend }}
@@ -321,7 +345,7 @@ let sloth: any = {}; // 是否使用命名空间？
 const textareaIn = ref<string>("");
 const textRegex = ref<string>("");
 const isRealtime = ref<boolean>(false);
-const isLoading = ref<boolean>(false);
+const isFilterLoading = ref<boolean>(false);
 const textareaOut = ref<string>("");
 const datepicker = ref<[Date, Date]>();
 const timepicker = ref<[Date, Date]>();
@@ -338,6 +362,10 @@ const isAutoBreakLineForTextareaIn = ref<boolean>(true);
 const isAutoBreakLineForTextareaOut = ref<boolean>(true);
 const isPointerEventsNone = ref<boolean>(false);
 const fileList = ref<any[]>([]);
+const isFileTooBig = ref<boolean>(false);
+const isFileLoading = ref<boolean>(false);
+const isResultTooBig = ref<boolean>(false);
+const isResultLoading = ref<boolean>(false);
 
 const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
@@ -370,6 +398,8 @@ let recognitionTimeEnd: number = 0;
 let oldReader: string = "Table";
 let readerChange: boolean = false;
 let isUploadChange: boolean = false;
+let arrayFileIn: string[] = [];
+let arrayTempResult: string[] = [];
 
 // Event
 
@@ -440,14 +470,58 @@ const uploadChange = (res: Record<string, any>, file: any): void => {
     reader.readAsText(res.raw);
     reader.onload = (e) => {
       if (isUploadChange) {
-        textareaIn.value += reader.result as string;
+        arrayFileIn = arrayFileIn.concat((reader.result as string).split("\n").filter(f => f !== ""));
       } else {
-        textareaIn.value = reader.result as string;
+        arrayFileIn = arrayFileIn = (reader.result as string).split("\n").filter(f => f !== "");
+      }
+      if (arrayFileIn.length > 9999) {
+        isFileTooBig.value = true;
+        textareaIn.value = "";
+      } else {
+        isFileTooBig.value = false;
+        arrayFileIn = [];
+      }
+      mappingData();
+      isTextareaInOrTimeChange = true;
+      arrayTextareaInFilterByTime = [];
+      if (isRealtime.value) {
+        logFilterForBtn.value();
       }
     };
   }
   fileList.value = [];
 }; // uploadChange
+
+// btnFileStillShowClick
+const btnFileStillShowClick = (): void => {
+  new Promise<void>((resolve) => {
+    isFileLoading.value = true;
+    setTimeout(() => {
+      resolve();
+    }, 50);
+  }).then(() => {
+    textareaIn.value = arrayFileIn.join("\n");
+    isFileTooBig.value = false;
+    isFileLoading.value = false;
+    mappingData();
+  });
+}; // btnFileStillShowClick
+
+// btnResultStillShowClick
+const btnResultStillShowClick = (): void => {
+  new Promise<void>((resolve) => {
+    isResultLoading.value = true;
+    setTimeout(() => {
+      resolve();
+    }, 50);
+  }).then(() => {
+    textareaOut.value = arrayTempResult.join("\n");
+    tableData.value = [];
+    arrayTempResult.forEach(f => tableData.value.push({data: f}));
+    isResultTooBig.value = false;
+    isResultLoading.value = false;
+  });
+}; // btnResultStillShowClick
 
 // 阅读器更改事件
 const changeReader = (): void => {
@@ -469,7 +543,7 @@ const changeReader = (): void => {
 const logFilterForBtn = ref((): void => {
   let dateTime: Date = new Date();
   new Promise<void>((resolve) => {
-    isLoading.value = true;
+    isFilterLoading.value = true;
     setTimeout(() => {
       dateTime = new Date();
       resolve();
@@ -505,46 +579,45 @@ const logFilterWithRegex = (): void => {
   logFilterWithTime();
   let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
   let isFilterFiled = (moment(timepickerStart).isValid() && moment(timepickerEnd).isValid()) || textRegex.value !== "";
-  if (textareaIn.value !== "" && isFilterFiled) {
+  if (arrayTextareaIn.length > 0 && isFilterFiled) {
     if (isRegexChange || isTextareaInOrTimeChange || readerChange) {
       isRegexChange = false;
       isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
-          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
               .map(s => s.replace(regexString, (value) => `<label class="highlight">${value}</label>`)
                   .replaceAll("  ", "&nbsp;&nbsp;"));
-          textareaOut.value = tempArray.join("\n");
-
-          tableData.value = [];
-          tempArray.forEach(f => tableData.value.push({data: f}));
         } else {
-          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
-          textareaOut.value = tempArray.join("\n");
-
-          tableData.value = [];
-          tempArray.forEach(f => tableData.value.push({data: f}));
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
         }
+        textareaOut.value = arrayTempResult.join("\n");
+
+        tableData.value = [];
+        arrayTempResult.forEach(f => tableData.value.push({data: f}));
       } else {
         if (reader.value === "Markdown" || reader.value === "Table") {
-          let tempArray = arrayTextareaInFilterByTime
+          arrayTempResult = arrayTextareaInFilterByTime
               .map(s => s.replaceAll("  ", "&nbsp;&nbsp;"));
-          textareaOut.value = tempArray.join("\n");
-
-          tableData.value = [];
-          tempArray.forEach(f => tableData.value.push({data: f}));
         } else {
-          textareaOut.value = arrayTextareaInFilterByTime.join("\n");
-
-          tableData.value = [];
-          arrayTextareaInFilterByTime.forEach(f => tableData.value.push({data: f}));
+          arrayTempResult = arrayTextareaInFilterByTime;
         }
+      }
+      if (arrayTempResult.length > 9999) {
+        isResultTooBig.value = true;
+        textareaOut.value = "";
+      } else {
+        isResultTooBig.value = false;
+        textareaOut.value = arrayTempResult.join("\n");
+
+        tableData.value = [];
+        arrayTempResult.forEach(f => tableData.value.push({data: f}));
       }
     }
   } else {
-    textareaOut.value = textareaIn.value;
+    textareaOut.value = arrayTextareaIn.join("\n");
   }
-  isLoading.value = false;
+  isFilterLoading.value = false;
 }; // 过滤
 
 // 二分查找arrayTextareaIn中不大于x的最大值
@@ -576,8 +649,14 @@ const binarySearchMin = (array: string[], x: string): number => {
 }; // 二分查找arrayTextareaIn中不小x的最小值
 
 const mappingData = (): void => {
-  arrayTextareaIn = textareaIn.value
-      .split("\n").filter(f => f !== "");
+  if (textareaIn.value !== "") {
+    arrayTextareaIn = textareaIn.value
+        .split("\n").filter(f => f !== "");
+    arrayFileIn = [];
+  } else {
+    arrayTextareaIn = arrayFileIn;
+    textareaIn.value = "";
+  }
 
   // Date
   if (arrayTextareaIn.length > 0) {
