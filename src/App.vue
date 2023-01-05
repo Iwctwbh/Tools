@@ -521,6 +521,7 @@ const btnResultStillShowClick = (): void => {
       resolve();
     }, 50);
   }).then(() => {
+    clearResult();
     switch (reader.value) {
       case "Markdown":
         markdownOut.value = arrayTempResult.join("\n");
@@ -608,11 +609,9 @@ const logFilterWithRegex = (): void => {
           arrayTempResult = arrayTextareaInFilterByTime;
         }
       }
+      clearResult();
       if (arrayTempResult.length > 9999) {
         isResultTooBig.value = true;
-        textareaOut.value = "";
-        markdownOut.value = "";
-        tableData.value = [];
       } else {
         isResultTooBig.value = false;
         switch (reader.value) {
@@ -630,11 +629,9 @@ const logFilterWithRegex = (): void => {
     }
   } else {
     arrayTempResult = arrayTextareaIn;
+    clearResult();
     if (arrayTempResult.length > 9999) {
       isResultTooBig.value = true;
-      textareaOut.value = "";
-      markdownOut.value = "";
-      tableData.value = [];
     } else {
       isResultTooBig.value = false;
       switch (reader.value) {
@@ -652,6 +649,13 @@ const logFilterWithRegex = (): void => {
   }
   isFilterLoading.value = false;
 }; // 过滤
+
+// clearResult
+const clearResult = (): void => {
+  textareaOut.value = "";
+  markdownOut.value = "";
+  tableData.value = [];
+}; // clearResult
 
 // 二分查找arrayTextareaIn中不大于x的最大值
 const binarySearchMax = (array: string[], x: string): number => {
