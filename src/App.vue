@@ -5,7 +5,7 @@
   <el-row>
     <el-col :lg="9">
       <el-checkbox
-          v-model="isAutoBreakLine"
+          v-model="isAutoBreakLineForTextareaIn"
           border
           class="tools"
           style="margin-bottom: 8px;"
@@ -53,7 +53,7 @@
             id="textareaIn"
             v-model="textareaIn"
             :autosize="{ minRows: 15, maxRows: 30 }"
-            :class="!isAutoBreakLine ? 'noWrap' : ''"
+            :class="!isAutoBreakLineForTextareaIn ? 'noWrap' : ''"
             placeholder="Please input text"
             type="textarea"
             @mouseleave="textareaMouseLeave"
@@ -183,9 +183,21 @@
             <span class="demonstration">高亮字体背景颜色</span>
             <el-color-picker v-model="colorPickerFontBackground"/>
           </div>
+          <el-checkbox
+              v-if="reader === 'Textarea'"
+              v-model="isAutoBreakLineForTextareaOut"
+              border
+              class="tools"
+              title="自动换行"
+          >
+            <strong style="font-size: 20px;">
+              自动换行
+            </strong>
+          </el-checkbox>
         </el-col>
       </el-row>
       <el-table
+          id="tableOut"
           v-if="reader === 'Table'"
           :data="tableData"
           :show-header="false"
@@ -207,6 +219,7 @@
           readonly
           type="textarea"
           style="flex: 1;"
+          :class="!isAutoBreakLineForTextareaOut ? 'noWrap' : ''"
       />
       <md-editor
           v-if="reader === 'Markdown'"
@@ -267,7 +280,7 @@
 }
 
 #app .noWrap textarea {
-  white-space: nowrap;
+  white-space: pre;
 }
 
 #app #upload .el-upload.el-upload--text.is-drag {
@@ -284,6 +297,10 @@
 
 #app #upload.pointer-events-none {
   pointer-events: none;
+}
+
+#app #tableOut table tbody tr td .cell {
+  white-space: pre-line;
 }
 
 @media only screen and (min-width: 1200px) {
@@ -317,7 +334,8 @@ const reader = ref<string>("Table");
 const tableData = ref<any[]>([]);
 const isCaseMatch = ref<boolean>(false);
 const isRegexMatch = ref<boolean>(false);
-const isAutoBreakLine = ref<boolean>(true);
+const isAutoBreakLineForTextareaIn = ref<boolean>(true);
+const isAutoBreakLineForTextareaOut = ref<boolean>(true);
 const isPointerEventsNone = ref<boolean>(false);
 const fileList = ref<any[]>([]);
 
@@ -494,25 +512,33 @@ const logFilterWithRegex = (): void => {
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
           let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
-              .map(s => s.replace(regexString, (value) =>
-                  `<label class="highlight">${value}</label>`)
+              .map(s => s.replace(regexString, (value) => `<label class="highlight">${value}</label>`)
                   .replaceAll("  ", "&nbsp;&nbsp;"));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
           tempArray.forEach(f => tableData.value.push({data: f}));
         } else {
-          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
-              .map(s => s.replaceAll("  ", "&nbsp;&nbsp;"));
+          let tempArray = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
           textareaOut.value = tempArray.join("\n");
 
           tableData.value = [];
           tempArray.forEach(f => tableData.value.push({data: f}));
         }
       } else {
-        textareaOut.value = arrayTextareaInFilterByTime.join("\n");
-        tableData.value = [];
-        arrayTextareaInFilterByTime.forEach(f => tableData.value.push({data: f}));
+        if (reader.value === "Markdown" || reader.value === "Table") {
+          let tempArray = arrayTextareaInFilterByTime
+              .map(s => s.replaceAll("  ", "&nbsp;&nbsp;"));
+          textareaOut.value = tempArray.join("\n");
+
+          tableData.value = [];
+          tempArray.forEach(f => tableData.value.push({data: f}));
+        } else {
+          textareaOut.value = arrayTextareaInFilterByTime.join("\n");
+
+          tableData.value = [];
+          arrayTextareaInFilterByTime.forEach(f => tableData.value.push({data: f}));
+        }
       }
     }
   } else {
@@ -649,7 +675,7 @@ const FilterByBreakLine = (): void => {
     if (recognitionTimeCheck(v)) {
       tempArray.push(v);
     } else if (tempArray.length > 1) {
-      tempArray[tempArray.length - 1] = tempArray[tempArray.length - 1].concat("\r\n").concat(v);
+      tempArray[tempArray.length - 1] = tempArray[tempArray.length - 1].concat("\n").concat(v);
     }
   });
   arrayTextareaIn = tempArray;
