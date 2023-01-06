@@ -4,17 +4,35 @@
   </h1>
   <el-row>
     <el-col :lg="9">
-      <el-checkbox
-          v-model="isAutoBreakLineForTextareaIn"
-          border
-          class="tools"
-          style="margin-bottom: 8px;"
-          title="自动换行"
-      >
-        <strong style="font-size: 20px;">
-          自动换行
-        </strong>
-      </el-checkbox>
+      <div style="display: flex; justify-content: space-between;">
+        <el-checkbox
+            v-model="isAutoBreakLineForTextareaIn"
+            border
+            class="tools"
+            style="margin-bottom: 8px;"
+            title="自动换行"
+        >
+          <strong style="font-size: 20px;">
+            自动换行
+          </strong>
+        </el-checkbox>
+        <el-dropdown @command="handleCommand">
+          <el-button type="primary">
+            例子 Sample
+            <el-icon class="el-icon--right">
+              <arrow-down/>
+            </el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="0">09:00:00.000 - 16:59:59.999</el-dropdown-item>
+              <el-dropdown-item command="1">2023/01/01 00:00:00.000 - 2023/01/01 23:59:59.999</el-dropdown-item>
+              <el-dropdown-item command="2">2023-01-01 00:00:00.000 - 2023-01-03 23:59:59.999</el-dropdown-item>
+              <el-dropdown-item command="3">01/01/2023 00:00:00.000 - 01/03/2023 23:59:59.999</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
       <!--      <el-upload-->
       <!--          action="none"-->
       <!--          :file-list="fileList"-->
@@ -372,16 +390,17 @@ const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
 });
 
-const ARRAY_HOURS: number[] = Array(24).fill(null).map((item, index) => index);
-const ARRAY_MINUTES: number[] = Array(60).fill(null).map((item, index) => index);
-const ARRAY_SECONDS: number[] = Array(60).fill(null).map((item, index) => index);
+const ARRAY_HOURS: number[] = [...Array(24).keys()];
+const ARRAY_MINUTES: number[] = Array.from(Array(60), (item, index) => index);
+const ARRAY_SECONDS: number[] = [...Array(60)].map((item, index) => index);
 const YEAR_START: string = "1969 ";
-const REGEX_TIME: RegExp = new RegExp(/(((\d{4}[\/\-]?\d{1,2}[\/\-]?\d{1,2})|(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})|(\d{4}))[T ])?\d{1,2}\:\d{1,2}:\d{1,2}(\.\d{1,3})?( ?[AP]M)?/i);
-const mapHierarchy: Record<string, number> = {
+const REGEX_TIME: RegExp = new RegExp(/^(((\d{4}[\/\-]?\d{1,2}[\/\-]?\d{1,2})|(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})|(\d{4}))[T ])?\d{1,2}\:\d{1,2}:\d{1,2}(\.\d{1,3})?( ?[AP]M)?$/i);
+const MAP_HIERARCHY: Record<string, number> = {
   "Table": 0,
   "Textarea": 1,
   "Markdown": 2
 };
+const ARRAY_DATE: string[] = ["2023/01/01", "2023/01/02", "2023/01/03"];
 
 let regexString = new RegExp("");
 let arrayTextareaIn: string[] = [];
@@ -411,6 +430,9 @@ let arrayTempResult: string[] = [];
 
 // 监听输入框
 watch([textareaIn], (): void => {
+  isFileTooBig.value = false;
+  isResultTooBig.value = false;
+  arrayFileIn = [];
   mappingData();
   isTextareaInOrTimeChange = true;
   arrayTextareaInFilterByTime = [];
@@ -446,7 +468,7 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
 }); // 监听选项
 
 // 监听timepicker
-watch([timepicker], (): void => {
+watch([timepicker, datepicker], (): void => {
   isTextareaInOrTimeChange = true;
   arrayTextareaInFilterByTime = [];
   if (isRealtime.value) {
@@ -455,6 +477,122 @@ watch([timepicker], (): void => {
 }); // 监听timepicker
 
 // Function
+
+// 下拉框点击事件
+const handleCommand = (command: string | number | object) => {
+  const LOGLEVEL: string[] = ["DEBUG", "INFO", "WARN", "ERROR", "FATAL"];
+  switch (command) {
+    case "0":
+      textareaIn.value =
+          [...Array(8)].map((itemHour, indexHour) =>
+              [...Array(60)].map((itemMinute, indexMinute) =>
+                  (indexHour + 9).toString()
+                      .padStart(2, "0")
+                      .concat(":")
+                      .concat(indexMinute.toString()
+                          .padStart(2, "0"))
+                      .concat(":")
+                      .concat(Math.floor(Math.random() * 60).toString()
+                          .padStart(2, "0"))
+                      .concat(".")
+                      .concat(Math.floor(Math.random() * 1000)
+                          .toString()
+                          .padStart(3, "0"))
+                      .concat(" ")
+                      .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+                      .concat(" [][] ")
+                      .concat(Math.random()
+                          .toString(36)
+                          .substring(2))
+              )
+          ).flat(Infinity).join("\n");
+      break;
+    case "1":
+      textareaIn.value =
+          [...Array(24)].map((itemHour, indexHour) =>
+              [...Array(60)].map((itemMinute, indexMinute) =>
+                  (_.first(ARRAY_DATE) ?? "2023/01/01").concat(" ")
+                      .concat(indexHour.toString()
+                          .padStart(2, "0"))
+                      .concat(":")
+                      .concat(indexMinute.toString()
+                          .padStart(2, "0"))
+                      .concat(":")
+                      .concat(Math.floor(Math.random() * 60).toString()
+                          .padStart(2, "0"))
+                      .concat(".")
+                      .concat(Math.floor(Math.random() * 1000)
+                          .toString()
+                          .padStart(3, "0"))
+                      .concat(" ")
+                      .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+                      .concat(" [][] ")
+                      .concat(Math.random()
+                          .toString(36)
+                          .substring(2))
+              )
+          ).flat(Infinity).join("\n");
+      break;
+    case "2":
+      textareaIn.value =
+          ARRAY_DATE.map((itemDate, indexDate) =>
+              [...Array(24)].map((itemHour, indexHour) =>
+                  [...Array(60)].map((itemMinute, indexMinute) =>
+                      moment(itemDate).format("yyyy-MM-DD")
+                          .concat(" ")
+                          .concat(indexHour.toString()
+                              .padStart(2, "0"))
+                          .concat(":")
+                          .concat(indexMinute.toString()
+                              .padStart(2, "0"))
+                          .concat(":")
+                          .concat(Math.floor(Math.random() * 60).toString()
+                              .padStart(2, "0"))
+                          .concat(".")
+                          .concat(Math.floor(Math.random() * 1000)
+                              .toString()
+                              .padStart(3, "0"))
+                          .concat(" ")
+                          .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+                          .concat(" [][] ")
+                          .concat(Math.random()
+                              .toString(36)
+                              .substring(2))
+                  )
+              )
+          ).flat(Infinity).join("\n");
+      break;
+    case "3":
+      textareaIn.value =
+          ARRAY_DATE.map((itemDate, indexDate) =>
+              [...Array(24)].map((itemHour, indexHour) =>
+                  [...Array(60)].map((itemMinute, indexMinute) =>
+                      moment(itemDate).format("MM/DD/YYYY")
+                          .concat(" ")
+                          .concat(indexHour.toString()
+                              .padStart(2, "0"))
+                          .concat(":")
+                          .concat(indexMinute.toString()
+                              .padStart(2, "0"))
+                          .concat(":")
+                          .concat(Math.floor(Math.random() * 60).toString()
+                              .padStart(2, "0"))
+                          .concat(".")
+                          .concat(Math.floor(Math.random() * 1000)
+                              .toString()
+                              .padStart(3, "0"))
+                          .concat(" ")
+                          .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+                          .concat(" [][] ")
+                          .concat(Math.random()
+                              .toString(36)
+                              .substring(2))
+                  )
+              )
+          ).flat(Infinity).join("\n");
+      break;
+  }
+}; // 下拉框点击事件
 
 // uploadMouseEnter
 const uploadMouseEnter = (e: any): void => {
@@ -472,26 +610,27 @@ const textareaMouseLeave = (e: any): void => {
 const uploadChange = (res: Record<string, any>, file: any): void => {
   if (res) {
     textareaIn.value = "";
-    var reader = new FileReader();
-    reader.readAsText(res.raw);
-    reader.onload = (e) => {
+    let fileReader = new FileReader();
+    fileReader.readAsText(res.raw);
+    fileReader.onload = (e) => {
+      isResultTooBig.value = false;
       if (isUploadChange) {
-        arrayFileIn = arrayFileIn.concat((reader.result as string).split("\n").filter(f => f !== ""));
+        arrayFileIn = arrayFileIn.concat((fileReader.result as string).split("\n").filter(f => f !== ""));
       } else {
-        arrayFileIn = arrayFileIn = (reader.result as string).split("\n").filter(f => f !== "");
+        arrayFileIn = arrayFileIn = (fileReader.result as string).split("\n").filter(f => f !== "");
       }
-      if (arrayFileIn.length > 9999) {
+      if (arrayFileIn.length > 28800) {
         isFileTooBig.value = true;
         textareaIn.value = "";
+        mappingData();
+        isTextareaInOrTimeChange = true;
+        arrayTextareaInFilterByTime = [];
+        if (isRealtime.value) {
+          logFilterForBtn.value();
+        }
       } else {
         isFileTooBig.value = false;
-        arrayFileIn = [];
-      }
-      mappingData();
-      isTextareaInOrTimeChange = true;
-      arrayTextareaInFilterByTime = [];
-      if (isRealtime.value) {
-        logFilterForBtn.value();
+        textareaIn.value = arrayFileIn.join("\n");
       }
     };
   }
@@ -540,7 +679,7 @@ const btnResultStillShowClick = (): void => {
 
 // 阅读器更改事件
 const changeReader = (): void => {
-  if (mapHierarchy[reader.value] !== mapHierarchy[oldReader]) {
+  if (MAP_HIERARCHY[reader.value] !== MAP_HIERARCHY[oldReader]) {
     readerChange = true;
   } else {
     readerChange = false;
@@ -574,12 +713,20 @@ const logFilterForRegex = ref((e: any): void => {
 // 二分过滤时间
 const logFilterWithTime = (): string[] => {
   if (isTextareaInOrTimeChange) {
-    // filter date
-    let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
-    let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
-    let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
-    let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString());
-    arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
+    if (isOnlyTime || isOneDay.value) {
+      // filter date only time
+      let [timepickerStart, timepickerEnd] = timepicker.value ?? ["", ""];
+      let [momentDateStart, momentDateEnd] = [moment(timepickerStart), moment(timepickerEnd)];
+      let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
+      let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString());
+      arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
+    } else {
+      let [datepickerStart, datepickerEnd] = datepicker.value ?? ["", ""];
+      let [momentDateStart, momentDateEnd] = [moment(datepickerStart), moment(datepickerEnd)];
+      let start = binarySearchMax(arrayTextareaIn, momentDateStart.add(-1, "seconds").toString()) + 1;
+      let end = binarySearchMin(arrayTextareaIn, momentDateEnd.add(1, "seconds").toString());
+      arrayTextareaInFilterByTime = arrayTextareaIn.slice(start, end);
+    }
   }
   return arrayTextareaInFilterByTime;
 }; // 二分过滤时间
@@ -610,7 +757,7 @@ const logFilterWithRegex = (): void => {
         }
       }
       clearResult();
-      if (arrayTempResult.length > 9999) {
+      if (arrayTempResult.length > 28800) {
         isResultTooBig.value = true;
       } else {
         isResultTooBig.value = false;
@@ -630,7 +777,7 @@ const logFilterWithRegex = (): void => {
   } else {
     arrayTempResult = arrayTextareaIn;
     clearResult();
-    if (arrayTempResult.length > 9999) {
+    if (arrayTempResult.length > 28800) {
       isResultTooBig.value = true;
     } else {
       isResultTooBig.value = false;
@@ -662,10 +809,18 @@ const binarySearchMax = (array: string[], x: string): number => {
   let [left, right] = [0, array.length - 1];
   while (left <= right) {
     let mid = Math.floor((left + right) / 2);
-    if (compareOnlyTime(moment(recognitionTime(array[mid])), moment(x)) <= 0) {
-      left = mid + 1;
+    if (isOnlyTime || isOneDay.value) {
+      if (compareOnlyTime(moment(recognitionTime(array[mid])), moment(x)) <= 0) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
     } else {
-      right = mid - 1;
+      if (moment(recognitionTime(array[mid])).isBefore(moment(x), "second")) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
     }
   }
   return right;
@@ -676,10 +831,18 @@ const binarySearchMin = (array: string[], x: string): number => {
   let [left, right] = [0, array.length - 1];
   while (left <= right) {
     let mid = Math.floor((left + right) / 2);
-    if (compareOnlyTime(moment(recognitionTime(array[mid])), moment(x)) >= 0) {
-      right = mid - 1;
+    if (isOnlyTime || isOneDay.value) {
+      if (compareOnlyTime(moment(recognitionTime(array[mid])), moment(x)) >= 0) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
     } else {
-      left = mid + 1;
+      if (moment(recognitionTime(array[mid])).isAfter(moment(x), "second")) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
     }
   }
   return left;
@@ -690,7 +853,7 @@ const mappingData = (): void => {
     arrayTextareaIn = textareaIn.value
         .split("\n").filter(f => f !== "");
     arrayFileIn = [];
-  } else {
+  } else if (arrayFileIn.length > 0) {
     arrayTextareaIn = arrayFileIn;
     textareaIn.value = "";
   }
@@ -804,8 +967,8 @@ const calendarChange = ref((array: [Date, Date]): void => {
 
 // 禁用日期
 const disabledDates = ref((date: Date): boolean => {
-  return moment(date).isBefore(_.first(datepicker.value), "date")
-      || moment(date).isAfter(_.last(datepicker.value), "date");
+  return moment(date).isBefore(moment(dateStart), "date")
+      || moment(date).isAfter(moment(dateEnd), "date");
 }); // 禁用日期
 
 // 禁用小时
