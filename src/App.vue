@@ -445,22 +445,22 @@ watch([textareaIn], (): void => {
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
   let tempText = textRegex.value;
   if (!isRegexMatch.value) {
-    tempText = tempText.replace("\\", "\\\\") // 转义
-        .replace(".", "\\.")
-        .replace("*", "\\*")
-        .replace("+", "\\+")
-        .replace("?", "\\?")
-        .replace("$", "\\$")
-        .replace("^", "\\^")
-        .replace("[", "\\[")
-        .replace("]", "\\]")
-        .replace("(", "\\(")
-        .replace(")", "\\)")
-        .replace("{", "\\{")
-        .replace("}", "\\}")
-        .replace("|", "\\|");
+    tempText = tempText.replaceAll("\\", "\\\\") // 转义
+        .replaceAll(".", "\\.")
+        .replaceAll("*", "\\*")
+        .replaceAll("+", "\\+")
+        .replaceAll("?", "\\?")
+        .replaceAll("$", "\\$")
+        .replaceAll("^", "\\^")
+        .replaceAll("[", "\\[")
+        .replaceAll("]", "\\]")
+        .replaceAll("(", "\\(")
+        .replaceAll(")", "\\)")
+        .replaceAll("{", "\\{")
+        .replaceAll("}", "\\}")
+        .replaceAll("|", "\\|");
   }
-  regexString = new RegExp(tempText, isCaseMatch.value ? "" : "i");
+  regexString = new RegExp(tempText, isCaseMatch.value ? "" : "gi");
   isRegexChange = true;
   if (isRealtime.value) {
     logFilterForBtn.value();
@@ -743,7 +743,7 @@ const logFilterWithRegex = (): void => {
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
           arrayTempResult = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
-              .map(s => s.replace(regexString, (value) => `<label class="highlight">${value}</label>`)
+              .map(s => s.replaceAll(regexString, (value) => `<label class="highlight">${value}</label>`)
                   .replaceAll("  ", "&nbsp;&nbsp;"));
         } else {
           arrayTempResult = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
