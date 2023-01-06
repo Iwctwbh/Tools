@@ -401,6 +401,7 @@ const MAP_HIERARCHY: Record<string, number> = {
   "Markdown": 2
 };
 const ARRAY_DATE: string[] = ["2023/01/01", "2023/01/02", "2023/01/03"];
+const MAX_LENGTH: number = 10000;
 
 let regexString = new RegExp("");
 let arrayTextareaIn: string[] = [];
@@ -619,7 +620,7 @@ const uploadChange = (res: Record<string, any>, file: any): void => {
       } else {
         arrayFileIn = arrayFileIn = (fileReader.result as string).split("\n").filter(f => f !== "");
       }
-      if (arrayFileIn.length > 28800) {
+      if (arrayFileIn.length > MAX_LENGTH) {
         isFileTooBig.value = true;
         textareaIn.value = "";
         mappingData();
@@ -757,7 +758,7 @@ const logFilterWithRegex = (): void => {
         }
       }
       clearResult();
-      if (arrayTempResult.length > 28800) {
+      if (arrayTempResult.length > MAX_LENGTH) {
         isResultTooBig.value = true;
       } else {
         isResultTooBig.value = false;
@@ -777,7 +778,7 @@ const logFilterWithRegex = (): void => {
   } else {
     arrayTempResult = arrayTextareaIn;
     clearResult();
-    if (arrayTempResult.length > 28800) {
+    if (arrayTempResult.length > MAX_LENGTH) {
       isResultTooBig.value = true;
     } else {
       isResultTooBig.value = false;
