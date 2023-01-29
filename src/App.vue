@@ -680,11 +680,7 @@ const btnResultStillShowClick = (): void => {
 
 // 阅读器更改事件
 const changeReader = (): void => {
-  if (MAP_HIERARCHY[reader.value] !== MAP_HIERARCHY[oldReader]) {
-    readerChange = true;
-  } else {
-    readerChange = false;
-  }
+  readerChange = MAP_HIERARCHY[reader.value] !== MAP_HIERARCHY[oldReader];
   oldReader = reader.value;
   logFilterForBtn.value();
 }; // 阅读器更改事件
@@ -743,11 +739,11 @@ const logFilterWithRegex = (): void => {
       isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => regexString.test(f))
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.match(regexString) || []).length)
               .map(s => s.replaceAll(regexString, (value) => `<label class="highlight">${value}</label>`)
                   .replaceAll("  ", "&nbsp;&nbsp;"));
         } else {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => regexString.test(f));
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.match(regexString) || []).length);
         }
       } else {
         if (reader.value === "Markdown" || reader.value === "Table") {
