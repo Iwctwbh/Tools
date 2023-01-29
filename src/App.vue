@@ -461,7 +461,7 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
         .replaceAll("}", "\\}")
         .replaceAll("|", "\\|");
   }
-  regexString = new RegExp(tempText, isCaseMatch.value ? "" : "gi");
+  regexString = new RegExp(tempText, isCaseMatch.value ? "g" : "gi");
   isRegexChange = true;
   if (isRealtime.value) {
     logFilterForBtn.value();
