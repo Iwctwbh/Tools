@@ -133,7 +133,7 @@
           @keyup="logFilterForRegex"
       />
       <div style="display: flex; justify-content: space-between;">
-        <div style="display: flex; justify-content: space-between; width: 200px;">
+        <div style="display: flex; justify-content: space-between; width: 290px;">
           <el-checkbox
               v-model="isCaseMatch"
               border
@@ -144,6 +144,7 @@
               Aa
             </strong>
           </el-checkbox>
+
           <el-checkbox
               v-model="isRegexMatch"
               border
@@ -152,6 +153,17 @@
           >
             <strong style="font-size: 20px;">
               .*
+            </strong>
+          </el-checkbox>
+
+          <el-checkbox
+              v-model="isFuzzySearch"
+              border
+              class="tools"
+              title="模糊搜索"
+          >
+            <strong style="font-size: 20px;">
+              Fuzzy
             </strong>
           </el-checkbox>
 
@@ -377,6 +389,7 @@ const reader = ref<string>("Table");
 const tableData = ref<any[]>([]);
 const isCaseMatch = ref<boolean>(false);
 const isRegexMatch = ref<boolean>(false);
+const isFuzzySearch = ref<boolean>(true);
 const isAutoBreakLineForTextareaIn = ref<boolean>(true);
 const isAutoBreakLineForTextareaOut = ref<boolean>(true);
 const isPointerEventsNone = ref<boolean>(false);
@@ -443,7 +456,7 @@ watch([textareaIn], (): void => {
 }); // 监听输入框
 
 // 监听选项
-watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
+watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): void => {
   let tempText = textRegex.value;
   if (!isRegexMatch.value) {
     tempText = tempText.replaceAll("\\", "\\\\") // 转义
@@ -460,6 +473,9 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch], (): void => {
         .replaceAll("{", "\\{")
         .replaceAll("}", "\\}")
         .replaceAll("|", "\\|");
+    if (isFuzzySearch.value) {
+      tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
+    }
   }
   regexString = new RegExp(tempText, isCaseMatch.value ? "g" : "gi");
   isRegexChange = true;
@@ -476,6 +492,20 @@ watch([timepicker, datepicker], (): void => {
     logFilterForBtn.value();
   }
 }); // 监听timepicker
+
+// 监听isFuzzySearch
+watch([isFuzzySearch], (): void => {
+  if (isFuzzySearch.value) {
+    isRegexMatch.value = false;
+  }
+}); // 监听isFuzzySearch
+
+// 监听isRegexMatch
+watch([isRegexMatch], (): void => {
+  if (isRegexMatch.value) {
+    isFuzzySearch.value = false;
+  }
+}); // 监听isRegexMatch
 
 // Function
 
@@ -633,6 +663,10 @@ const uploadChange = (res: Record<string, any>, file: any): void => {
         isFileTooBig.value = false;
         textareaIn.value = arrayFileIn.join("\n");
       }
+
+      setTimeout(() => {
+        isUploadChange = false;
+      }, 1000);
     };
   }
   fileList.value = [];
