@@ -474,7 +474,9 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): voi
         .replaceAll("}", "\\}")
         .replaceAll("|", "\\|");
     if (isFuzzySearch.value) {
-      tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
+      if (tempText.split(" ").length > 1) {
+        tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
+      }
     }
   }
   regexString = new RegExp(tempText, isCaseMatch.value ? "g" : "gi");
