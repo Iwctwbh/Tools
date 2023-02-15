@@ -417,6 +417,7 @@ const ARRAY_DATE: string[] = ["2023/01/01", "2023/01/02", "2023/01/03"];
 const MAX_LENGTH: number = 10000;
 
 let regexString = new RegExp("");
+let regexInverseString = new RegExp("");
 let arrayTextareaIn: string[] = [];
 let arrayTextareaInFilterByTime: string[] = [];
 let arrayDisabledHours: number[] = [];
@@ -458,6 +459,7 @@ watch([textareaIn], (): void => {
 // 监听选项
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): void => {
   let tempText = textRegex.value;
+  let tempInverseText = "^(?!.*(" + textRegex.value + "))";
   if (!isRegexMatch.value) {
     tempText = tempText.replaceAll("\\", "\\\\") // 转义
         .replaceAll(".", "\\.")
@@ -474,12 +476,15 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): voi
         .replaceAll("}", "\\}")
         .replaceAll("|", "\\|");
     if (isFuzzySearch.value) {
-      if (tempText.split(" ").length > 1) {
+      if (tempText.split(" ").length > 1 || true) {
+        // ^(?!.*((abc)|(def))))
+        tempInverseText = "^(?!.*(" + tempText.split(" ").map(m => "(" + m + ")").join("|") + "))";
         tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
       }
     }
   }
   regexString = new RegExp(tempText, isCaseMatch.value ? "g" : "gi");
+  regexInverseString = new RegExp(tempInverseText, isCaseMatch.value ? "g" : "gi");
   isRegexChange = true;
   if (isRealtime.value) {
     logFilterForBtn.value();
@@ -775,7 +780,7 @@ const logFilterWithRegex = (): void => {
       isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.match(regexString) || []).length)
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => !(f.match(regexInverseString) || []).length)
               .map(s => s.replaceAll(regexString, (value) => `<label class="highlight">${value}</label>`)
                   .replaceAll("  ", "&nbsp;&nbsp;"));
         } else {
