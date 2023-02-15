@@ -459,7 +459,7 @@ watch([textareaIn], (): void => {
 // 监听选项
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): void => {
   let tempText = textRegex.value;
-  let tempInverseText = "^(?!.*(" + textRegex.value + "))";
+  let tempInverseText = "^(?!.*(" + tempText + "))";
   if (!isRegexMatch.value) {
     tempText = tempText.replaceAll("\\", "\\\\") // 转义
         .replaceAll(".", "\\.")
@@ -475,6 +475,7 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): voi
         .replaceAll("{", "\\{")
         .replaceAll("}", "\\}")
         .replaceAll("|", "\\|");
+    tempInverseText = "^(?!.*(" + tempText + "))";
     if (isFuzzySearch.value) {
       if (tempText.split(" ").length > 1 || true) {
         // ^(?!.*((abc)|(def))))
