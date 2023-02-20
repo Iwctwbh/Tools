@@ -156,16 +156,31 @@
             </strong>
           </el-checkbox>
 
-          <el-checkbox
-              v-model="isFuzzySearch"
-              border
-              class="tools"
-              title="模糊搜索"
-          >
-            <strong style="font-size: 20px;">
-              Fuzzy
-            </strong>
-          </el-checkbox>
+          <div id="divFuzzySearch">
+            <el-checkbox
+                id="isFuzzySearchAnd"
+                v-model="isFuzzySearchAnd"
+                border
+                class="tools"
+                title="模糊搜索"
+            >
+              <strong style="font-size: 20px;">
+                &
+              </strong>
+            </el-checkbox>
+
+            <el-checkbox
+                id="isFuzzySearchOr"
+                v-model="isFuzzySearchOr"
+                border
+                class="tools"
+                title="模糊搜索"
+            >
+              <strong style="font-size: 20px;">
+                |
+              </strong>
+            </el-checkbox>
+          </div>
 
           <el-checkbox
               v-model="isRealtime"
@@ -357,6 +372,22 @@
   white-space: pre-line;
 }
 
+#app #divFuzzySearch .tools {
+  padding: 0 10px;
+}
+
+#app #divFuzzySearch .tools:first-child {
+  border-right: 0px;
+}
+
+#app #divFuzzySearch .tools:last-child {
+  border-left: 0px;
+}
+
+#app #divFuzzySearch .tools .el-checkbox__label {
+  padding: 0;
+}
+
 @media only screen and (min-width: 1200px) {
   #app .paddingTop40px {
     padding-top: 40px;
@@ -389,7 +420,8 @@ const reader = ref<string>("Table");
 const tableData = ref<any[]>([]);
 const isCaseMatch = ref<boolean>(false);
 const isRegexMatch = ref<boolean>(false);
-const isFuzzySearch = ref<boolean>(true);
+const isFuzzySearchAnd = ref<boolean>(true);
+const isFuzzySearchOr = ref<boolean>(false);
 const isAutoBreakLineForTextareaIn = ref<boolean>(true);
 const isAutoBreakLineForTextareaOut = ref<boolean>(true);
 const isPointerEventsNone = ref<boolean>(false);
@@ -457,7 +489,7 @@ watch([textareaIn], (): void => {
 }); // 监听输入框
 
 // 监听选项
-watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): void => {
+watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearchAnd, isFuzzySearchOr], (): void => {
   let tempText = textRegex.value;
   let tempInverseText = "^(?!.*(" + tempText + "))";
   if (!isRegexMatch.value) {
@@ -476,13 +508,14 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearch], (): voi
         .replaceAll("}", "\\}")
         .replaceAll("|", "\\|");
     tempInverseText = "^(?!.*(" + tempText + "))";
-    if (isFuzzySearch.value) {
-      if (tempText.split(" ").length > 1 || true) {
-        // ^(?!.*((abc)|(def))))
-        tempInverseText = "^(?!.*(" + tempText.split(" ").map(m => "(" + m + ")").join("|") + "))";
-        tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
-      }
+    if (isFuzzySearchOr.value) {
+      // ^(?!.*((abc)|(def))))
+      tempInverseText = "^(?!.*(" + tempText.split(" ").map(m => "(" + m + ")").join("|") + "))";
+    } else if (isFuzzySearchAnd.value) {
+      // ^(?!.*((abc)))|^(?!.*((def)))
+      tempInverseText = tempText.split(" ").map(m => "^(?!.*((" + m + ")))").join("|");
     }
+    tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
   }
   regexString = new RegExp(tempText, isCaseMatch.value ? "g" : "gi");
   regexInverseString = new RegExp(tempInverseText, isCaseMatch.value ? "g" : "gi");
@@ -501,17 +534,27 @@ watch([timepicker, datepicker], (): void => {
   }
 }); // 监听timepicker
 
-// 监听isFuzzySearch
-watch([isFuzzySearch], (): void => {
-  if (isFuzzySearch.value) {
+// 监听isFuzzySearchAnd
+watch([isFuzzySearchAnd], (): void => {
+  if (isFuzzySearchAnd.value) {
     isRegexMatch.value = false;
+    isFuzzySearchOr.value = false;
   }
-}); // 监听isFuzzySearch
+}); // 监听isFuzzySearchAnd
+
+// 监听isFuzzySearchOr
+watch([isFuzzySearchOr], (): void => {
+  if (isFuzzySearchOr.value) {
+    isRegexMatch.value = false;
+    isFuzzySearchAnd.value = false;
+  }
+}); // 监听isFuzzySearchOr
 
 // 监听isRegexMatch
 watch([isRegexMatch], (): void => {
   if (isRegexMatch.value) {
-    isFuzzySearch.value = false;
+    isFuzzySearchAnd.value = false;
+    isFuzzySearchOr.value = false;
   }
 }); // 监听isRegexMatch
 
