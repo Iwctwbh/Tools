@@ -510,10 +510,10 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearchAnd, isFuz
     tempInverseText = "^(?!.*(" + tempText + "))";
     if (isFuzzySearchOr.value) {
       // ^(?!.*((abc)|(def))))
-      tempInverseText = "^(?!.*(" + tempText.split(" ").map(m => "(" + m + ")").join("|") + "))";
+      tempInverseText = "^(?!.*(" + tempText.trim().split(" ").filter(f => f !== "").map(m => "(" + m + ")").join("|") + "))";
     } else if (isFuzzySearchAnd.value) {
       // ^(?!.*((abc)))|^(?!.*((def)))
-      tempInverseText = tempText.split(" ").map(m => "^(?!.*((" + m + ")))").join("|");
+      tempInverseText = tempText.trim().split(" ").filter(f => f !== "").map(m => "^(?!.*((" + m + ")))").join("|");
     }
     tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
   }
