@@ -511,11 +511,12 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearchAnd, isFuz
     if (isFuzzySearchOr.value) {
       // ^(?!.*((abc)|(def))))
       tempInverseText = "^(?!.*(" + tempText.trim().split(" ").filter(f => f !== "").map(m => "(" + m + ")").join("|") + "))";
+      tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
     } else if (isFuzzySearchAnd.value) {
       // ^(?!.*((abc)))|^(?!.*((def)))
       tempInverseText = tempText.trim().split(" ").filter(f => f !== "").map(m => "^(?!.*((" + m + ")))").join("|");
+      tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
     }
-    tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
   }
   regexString = new RegExp(tempText, isCaseMatch.value ? "g" : "gi");
   regexInverseString = new RegExp(tempInverseText, isCaseMatch.value ? "g" : "gi");
@@ -828,7 +829,7 @@ const logFilterWithRegex = (): void => {
               .map(s => s.replaceAll(regexString, (value) => `<label class="highlight">${value}</label>`)
                   .replaceAll("  ", "&nbsp;&nbsp;"));
         } else {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.match(regexString) || []).length);
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.match(regexInverseString) || []).length);
         }
       } else {
         if (reader.value === "Markdown" || reader.value === "Table") {
