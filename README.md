@@ -3,8 +3,8 @@
 自动识别日期时间，可按时间过滤或正则过滤。
 Automatically recognize date and time, can filter by time or regular expression.
 
-[在线使用](https://iwctwbh.github.io/Tools/LogFilter/)
-[Online](https://iwctwbh.github.io/Tools/LogFilter/)
+[在线使用](https://iwctwbh.github.io/LogFilter/)
+[Online](https://iwctwbh.github.io/LogFilter/)
 
 有bug可提issue，或者直接联系我。
 If you find bug, please mention the issue or contact me directly.
