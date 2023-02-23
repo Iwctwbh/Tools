@@ -3,7 +3,7 @@
     首页 Home Page
   </h1>
   <el-row
-      v-for="(item, index) in useRouter().getRoutes().filter(f => f.path.split('/').length > 2)"
+      v-for="(item, index) in useRouter().getRoutes().filter(f => f.path.split('/').length > 1)"
       style="justify-content: center;"
   >
     <el-col style="text-align: center;">
