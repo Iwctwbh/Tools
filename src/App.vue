@@ -3,7 +3,7 @@
 
   <el-row style="justify-content: center;">
     <el-col span="5" style="text-align: center;">
-      <a href="/">
+      <a href="/Home">
         回到首页 Back To Home Page
       </a>
     </el-col>
