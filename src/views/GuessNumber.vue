@@ -1,6 +1,6 @@
 <template>
   <h1 class="title">
-    猜数游戏 Guess The Number
+    猜数游戏 GuessNumber
   </h1>
   <el-row style="justify-content: center;">
     <el-col span="5" style="text-align: center;">

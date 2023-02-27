@@ -1,6 +1,6 @@
 <template>
   <h1 class="title">
-    过滤Log
+    日志过滤 LogFilter
   </h1>
   <el-row>
     <el-col :lg="9">
@@ -87,15 +87,6 @@
             @mouseleave="textareaMouseLeave"
         />
       </div>
-      <p>
-        作者: <a href="https://github.com/Iwctwbh" target="_blank">Iwctwbh</a>
-      </p>
-      <p>
-        本项目开源:
-        <a href="https://github.com/Iwctwbh/LogFilter" target="_blank">
-          https://github.com/Iwctwbh/LogFilter
-        </a>
-      </p>
     </el-col>
     <el-col :lg="5" class="paddingTop40px" style="margin: 0 auto;">
       <div style="padding-bottom: 10px; width: 100%; display: inline-flex;">
@@ -305,11 +296,6 @@
 
 <style>
 @import "md-editor-v3/lib/style.css";
-
-#app {
-  max-width: 90%;
-  margin: 0 auto;
-}
 
 #app .el-date-editor.el-input, #app .el-date-editor.el-input__wrapper {
   width: auto;

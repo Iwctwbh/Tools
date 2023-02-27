@@ -13,8 +13,13 @@ export const constantRoutes = [
         component: () => import("../views/LogFilter.vue")
     },
     {
+        path: "/Tools/JsonFormat",
+        name: "Json格式化 JsonFormat",
+        component: () => import("../views/JsonFormat.vue")
+    },
+    {
         path: "/Tools/GuessNumber",
-        name: "猜数游戏 Guess Number",
+        name: "猜数游戏 GuessNumber",
         component: () => import("../views/GuessNumber.vue")
     },
     {
