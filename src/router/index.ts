@@ -20,7 +20,7 @@ export const constantRoutes = [
     {
         // 非路由节点，重定向至首页
         path: "/:pathMatch(.*)*",
-        redirect: "/Home"
+        redirect: "/Tools/Home"
     }
 ];
 
