@@ -131,7 +131,7 @@ const btnStartClick = (): void => {
   count = 0;
   canSubmit.value = true;
   randNumber = Math.floor(Math.random() * (10 ** (digit.value + 1 - 1) - 10 ** (digit.value - 1))) + 10 ** (digit.value - 1);
-  textareaOut.value += "----------\r\n游戏开始。Game Started.\r\n----------\r\n";
+  textareaOut.value = "游戏开始。Game Started.\r\n";
   scrollTop();
 }; // btnStartClick
 
