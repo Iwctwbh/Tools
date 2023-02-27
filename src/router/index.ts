@@ -3,17 +3,17 @@ import {createRouter, createWebHistory} from "vue-router";
 // 公共路由
 export const constantRoutes = [
     {
-        path: "/Home",
+        path: "/Tools/Home",
         name: "首页 Home Page",
         component: () => import("../views/Home.vue")
     },
     {
-        path: "/LogFilter",
+        path: "/Tools/LogFilter",
         name: "日志过滤 LogFilter",
         component: () => import("../views/LogFilter.vue")
     },
     {
-        path: "/GuessNumber",
+        path: "/Tools/GuessNumber",
         name: "猜数游戏 Guess Number",
         component: () => import("../views/GuessNumber.vue")
     },
