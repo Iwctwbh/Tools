@@ -69,8 +69,8 @@ const formatJson = (): void => {
   try {
     JSON.parse(textareaIn.value);
     textareaOut.value = JSON.stringify(JSON.parse(textareaIn.value), null, 4);
-    let myJSON = JSON.parse(textareaIn.value);
 
+    let myJSON = JSON.parse(textareaIn.value);
     let formatter = new JSONFormatter(myJSON);
 
     let elementJsonOut = document.getElementById("divJsonOut");
@@ -88,6 +88,15 @@ const reFormatJson = (): void => {
   try {
     JSON.parse(textareaOut.value);
     textareaIn.value = JSON.stringify(JSON.parse(textareaOut.value));
+
+    let myJSON = JSON.parse(textareaIn.value);
+    let formatter = new JSONFormatter(myJSON);
+
+    let elementJsonOut = document.getElementById("divJsonOut");
+    if (elementJsonOut) {
+      elementJsonOut.innerHTML = "";
+      elementJsonOut.appendChild(formatter.render());
+    }
   } catch {
     textareaIn.value = "Json有误 Json has a mistake.";
   }
