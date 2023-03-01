@@ -35,7 +35,8 @@
         </div>
       </div>
     </el-col>
-    <el-col :lg="9">
+    <el-col :lg="9" style="display: flex;">
+      <div id="divJsonOut"></div>
       <el-input
           id="textareaOut"
           v-model="textareaOut"
@@ -54,6 +55,7 @@
 <script lang='ts' setup>
 // Import
 import {ref} from "vue";
+import JSONFormatter from "json-formatter-js";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
@@ -67,6 +69,15 @@ const formatJson = (): void => {
   try {
     JSON.parse(textareaIn.value);
     textareaOut.value = JSON.stringify(JSON.parse(textareaIn.value), null, 4);
+    let myJSON = JSON.parse(textareaIn.value);
+
+    let formatter = new JSONFormatter(myJSON);
+
+    let elementJsonOut = document.getElementById("divJsonOut");
+    if (elementJsonOut) {
+      elementJsonOut.innerHTML = "";
+      elementJsonOut.appendChild(formatter.render());
+    }
   } catch {
     textareaOut.value = "Json有误 Json has a mistake.";
   }
