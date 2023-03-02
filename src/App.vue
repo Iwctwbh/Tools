@@ -8,7 +8,7 @@
       </p>
       <p>
         本项目开源:
-        <a href="https://github.com/Iwctwbh/LogFilter" target="_blank">
+        <a href="https://github.com/Iwctwbh/Tools" target="_blank">
           https://github.com/Iwctwbh/LogFilter
         </a>
       </p>

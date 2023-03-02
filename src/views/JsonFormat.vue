@@ -35,16 +35,15 @@
         </div>
       </div>
     </el-col>
-    <el-col :lg="9" style="display: flex;">
-      <div id="divJsonOut"></div>
+    <el-col :lg="9">
       <el-input
           id="textareaOut"
           v-model="textareaOut"
-          :autosize="{ minRows: 15, maxRows: 30 }"
+          :autosize="{ minRows: 15, maxRows: 15 }"
           placeholder="Please input text"
           type="textarea"
       />
-      <p style="margin-top: 0;">&nbsp;</p>
+      <div id="divJsonOut"></div>
     </el-col>
   </el-row>
 </template>
