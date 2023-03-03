@@ -18,6 +18,11 @@ export const constantRoutes = [
         component: () => import("../views/JsonFormat.vue")
     },
     {
+        path: "/Tools/WordCompare",
+        name: "文本对比 WordCompare",
+        component: () => import("../views/WordCompare.vue")
+    },
+    {
         path: "/Tools/GuessNumber",
         name: "猜数游戏 GuessNumber",
         component: () => import("../views/GuessNumber.vue")

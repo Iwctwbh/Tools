@@ -46,6 +46,14 @@
       <div id="divJsonOut"></div>
     </el-col>
   </el-row>
+
+  <el-row style="justify-content: center;">
+    <el-col span="5" style="text-align: center;">
+      <p>
+        源码参考: <a href="https://github.com/mohsen1/json-formatter-js" target="_blank">json-formatter-js</a>
+      </p>
+    </el-col>
+  </el-row>
 </template>
 
 <style>

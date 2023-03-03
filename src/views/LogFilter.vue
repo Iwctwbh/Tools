@@ -374,6 +374,10 @@
   padding: 0;
 }
 
+#app .paddingTop40px {
+  padding-top: 10px;
+}
+
 @media only screen and (min-width: 1200px) {
   #app .paddingTop40px {
     padding-top: 40px;
