@@ -39,7 +39,9 @@
 </template>
 
 <style>
-
+#divDiffOut del {
+  overflow-wrap: break-word;
+}
 </style>
 
 <script lang="ts" setup>
