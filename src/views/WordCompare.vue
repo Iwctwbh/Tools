@@ -39,8 +39,18 @@
 </template>
 
 <style>
+#divDiffOut span {
+  overflow-wrap: break-word;
+}
+
+#divDiffOut ins {
+  overflow-wrap: break-word;
+  color: green;
+}
+
 #divDiffOut del {
   overflow-wrap: break-word;
+  color: red;
 }
 </style>
 
