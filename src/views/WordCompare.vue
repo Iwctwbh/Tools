@@ -25,7 +25,7 @@
     </el-col>
 
     <el-col :lg="8">
-      <div id="divDiffOut" style="min-height: 325px; border: #dcdfe6 solid 1px;"></div>
+      <div id="divDiffOut" style="min-height: 325px; border: #dcdfe6 solid 1px; padding: 5px 11px;"></div>
     </el-col>
   </el-row>
 
