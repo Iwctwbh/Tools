@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 // 公共路由
 export const constantRoutes = [
@@ -21,6 +21,16 @@ export const constantRoutes = [
         path: "/Tools/WordCompare",
         name: "文本对比 WordCompare",
         component: () => import("../views/WordCompare.vue")
+    },
+    {
+        path: "/Tools/UUIDCreate",
+        name: "UUID生成 UUIDCreate",
+        component: () => import("../views/UUIDCreate.vue")
+    },
+    {
+        path: "/Tools/RegexReplace",
+        name: "正则替换 RegexReplace",
+        component: () => import("../views/RegexReplace.vue")
     },
     {
         path: "/Tools/GuessNumber",

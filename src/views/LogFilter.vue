@@ -153,7 +153,7 @@
                 v-model="isFuzzySearchAnd"
                 border
                 class="tools"
-                title="模糊搜索"
+                title="模糊搜索 与"
             >
               <strong style="font-size: 20px;">
                 &
@@ -165,7 +165,7 @@
                 v-model="isFuzzySearchOr"
                 border
                 class="tools"
-                title="模糊搜索"
+                title="模糊搜索 或"
             >
               <strong style="font-size: 20px;">
                 |
@@ -387,7 +387,7 @@
 
 <script lang='ts' setup>
 // Import
-import {computed, ref, watch} from "vue";
+import { computed, ref, watch } from "vue";
 import moment from "moment";
 import _ from "lodash";
 import MdEditor from "md-editor-v3";
