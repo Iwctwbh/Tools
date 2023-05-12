@@ -18,6 +18,25 @@ If it helps you, please star.
 自动识别日期时间，可按时间过滤或正则过滤。
 Automatically recognize date and time, can filter by time or regular expression.
 
+#### [Json格式化 JsonFormat](https://iwctwbh.github.io/Tools/JsonFormat)
+
+Json格式化，以及逆格式化。
+Json format, and reverse format.
+
+#### [文本对比 WordCompare](https://iwctwbh.github.io/Tools/WordCompare)
+
+文本差异对比。
+Text difference comparison.
+
+#### [UUID生成 UUIDCreate](https://iwctwbh.github.io/Tools/UUIDCreate)
+
+UUID生成，随机数生成。
+UUID create, random number create.
+
+#### [正则替换 RegexReplace](https://iwctwbh.github.io/Tools/RegexReplace)
+
+开发中。
+
 ### 小游戏 Game
 
 #### [猜数游戏 GuessNumber](https://iwctwbh.github.io/Tools/GuessNumber)
