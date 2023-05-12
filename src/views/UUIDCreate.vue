@@ -5,14 +5,15 @@
 
   <el-row style="justify-content: center;">
     <el-col span="5" style="text-align: center;">
-      数量 Count
-      <el-input-number
-          v-model="CountNumber"
-          max="999"
-          min="1"
-          size="large"
-      ></el-input-number>
-      &nbsp;
+      <div>
+        <label>数量 Count&nbsp;</label>
+        <el-input-number
+            v-model="UUIDCountNumber"
+            max="999"
+            min="1"
+            size="large"
+        ></el-input-number>
+      </div>
       <el-button
           size="large"
           type="primary"
@@ -27,7 +28,7 @@
     <el-col span="5" style="text-align: center;">
       数量 Count
       <el-input-number
-          v-model="CountNumber"
+          v-model="RandomCountNumber"
           max="999"
           min="1"
           size="large"
@@ -40,68 +41,70 @@
           size="large"
       ></el-input-number>
       &nbsp;
-      <div id="divCase">
+      <div style="display: flex; justify-content: center;">
+        <div id="divCase">
+          <el-checkbox
+              id="isCaseUpper"
+              v-model="isCaseUpper"
+              border
+              class=""
+              title="全大写"
+          >
+            <strong style="font-size: 20px;">
+              A
+            </strong>
+          </el-checkbox>
+
+          <el-checkbox
+              id="isCaseInsensitive"
+              v-model="isCaseInsensitive"
+              border
+              class="center"
+              title="不区分大小写"
+          >
+            <strong style="font-size: 20px;">
+              Aa
+            </strong>
+          </el-checkbox>
+
+          <el-checkbox
+              id="isCaseLower"
+              v-model="isCaseLower"
+              border
+              class=""
+              title="全小写"
+          >
+            <strong style="font-size: 20px;">
+              a
+            </strong>
+          </el-checkbox>
+        </div>
+        &nbsp;
         <el-checkbox
-            id="isCaseUpper"
-            v-model="isCaseUpper"
+            id="hasNumber"
+            v-model="isHasNumber"
             border
             class=""
-            title="全大写"
+            title="是否含有数字"
         >
           <strong style="font-size: 20px;">
-            A
+            0-9
           </strong>
         </el-checkbox>
-
+        &nbsp;
         <el-checkbox
-            id="isCaseInsensitive"
-            v-model="isCaseInsensitive"
-            border
-            class="center"
-            title="不区分大小写"
-        >
-          <strong style="font-size: 20px;">
-            Aa
-          </strong>
-        </el-checkbox>
-
-        <el-checkbox
-            id="isCaseLower"
-            v-model="isCaseLower"
+            id="has"
+            v-model="isHasSpecialSymbols"
             border
             class=""
-            title="全小写"
+            title="是否含有特殊符号"
         >
           <strong style="font-size: 20px;">
-            a
+            !@#
           </strong>
         </el-checkbox>
+        &nbsp;
       </div>
-      &nbsp;
-      <el-checkbox
-          id="hasNumber"
-          v-model="isHasNumebr"
-          border
-          class=""
-          title="是否含有数字"
-      >
-        <strong style="font-size: 20px;">
-          0-9
-        </strong>
-      </el-checkbox>
-      &nbsp;
-      <el-checkbox
-          id="has"
-          v-model="isHasSpecialSymbols"
-          border
-          class=""
-          title="是否含有特殊符号"
-      >
-        <strong style="font-size: 20px;">
-          !@#
-        </strong>
-      </el-checkbox>
-      &nbsp;
       <el-button
           size="large"
           type="primary"
@@ -165,23 +168,24 @@ import { ref, watch } from "vue";
 let sloth: any = {}; // 是否使用命名空间？
 
 const textareaOut = ref<string>("");
-const CountNumber = ref<number>(1);
-const DigitCountNumber = ref<number>(1);
+const UUIDCountNumber = ref<number>(1);
+const RandomCountNumber = ref<number>(1);
+const DigitCountNumber = ref<number>(12);
 const isCaseUpper = ref<boolean>(false);
-const isCaseInsensitive = ref<boolean>(false);
+const isCaseInsensitive = ref<boolean>(true);
 const isCaseLower = ref<boolean>(false);
-const isHasNumebr = ref<boolean>(false);
-const isHasSpecialSymbols = ref<boolean>(false);
+const isHasNumber = ref<boolean>(true);
+const isHasSpecialSymbols = ref<boolean>(true);
 
 const arrayNumber: string[] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-const arraySpecialSymbols: string[] = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", ";", ":", "'", "\"", ",", "<", ".", ">", "/", "?", "~", "`", "|"];
+const arraySpecialSymbols: string[] = ["`", "~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "{", "]", "}", "|", ";", ":", ",", "<", ".", ">", "/", "?"];
 const arrayLower: string[] = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
 const arrayUpper: string[] = arrayLower.map((item: string) => item.toUpperCase());
 
 // Event
 const btnUUIDCreate = () => {
   let uuidArray: string[] = [];
-  for (let i = 0; i < CountNumber.value; ++i) {
+  for (let i = 0; i < UUIDCountNumber.value; ++i) {
     uuidArray.push(uuid());
   }
   textareaOut.value = uuidArray.join("\n");
@@ -189,8 +193,28 @@ const btnUUIDCreate = () => {
 
 const btnRandomCreate = () => {
   let randomArray: string[] = [];
-  for (let i = 0; i < CountNumber.value; ++i) {
-    // randomArray.push(_.random(DigitCountNumber.value));
+  let randomString: string = "";
+  let tempRandomString: string = "";
+  if (isCaseUpper.value) {
+    randomString += arrayUpper.join("");
+  } else if (isCaseInsensitive.value) {
+    randomString += arrayUpper.join("");
+    randomString += arrayLower.join("");
+  } else if (isCaseLower.value) {
+    randomString += arrayLower.join("");
+  }
+  if (isHasNumber.value) {
+    randomString += arrayNumber.join("");
+  }
+  if (isHasSpecialSymbols.value) {
+    randomString += arraySpecialSymbols.join("");
+  }
+  for (let i = 0; i < RandomCountNumber.value; ++i) {
+    tempRandomString = "";
+    for (let j = 0; j < DigitCountNumber.value; ++j) {
+      tempRandomString += randomString[Math.floor(Math.random() * randomString.length)];
+    }
+    randomArray.push(tempRandomString);
   }
   textareaOut.value = randomArray.join("\n");
 };
