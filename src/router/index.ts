@@ -33,9 +33,14 @@ export const constantRoutes = [
         component: () => import("../views/RegexReplace.vue")
     },
     {
-        path: "/Tools/GuessNumber",
-        name: "猜数游戏 GuessNumber",
-        component: () => import("../views/GuessNumber.vue")
+        path: "/Tools/CaseChange",
+        name: "大小写 CaseChange",
+        component: () => import("../views/CaseChange.vue")
+    },
+    {
+        path: "/Tools/NumberGuess",
+        name: "猜数游戏 NumberGuess",
+        component: () => import("../views/NumberGuess.vue")
     },
     {
         // 非路由节点，重定向至首页

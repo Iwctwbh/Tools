@@ -1,6 +1,6 @@
 <template>
   <h1 class="title">
-    猜数游戏 GuessNumber
+    猜数游戏 NumberGuess
   </h1>
   <el-row style="justify-content: center;">
     <el-col span="5" style="text-align: center;">
@@ -70,8 +70,8 @@
 
 <script lang='ts' setup>
 // import
-import {reactive, ref} from "vue";
-import type {FormInstance, FormRules} from "element-plus";
+import { reactive, ref } from "vue";
+import type { FormInstance, FormRules } from "element-plus";
 
 
 // Init
@@ -100,7 +100,7 @@ let rules = reactive<FormRules>({
 // submit
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  await formEl.validate((valid, fields) => {
+  await formEl.validate((valid) => {
     if (valid) {
       textareaOut.value += `答案：${ruleForm.validation}\r\n`;
       if (ruleForm.validation.length === digit.value) {
