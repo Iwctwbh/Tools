@@ -1,6 +1,6 @@
 <template>
   <h1 class="title">
-    大小写切换 CaseChange
+    大小写切换 CaseConvert
   </h1>
   <el-row style="padding-top: 10px; justify-content: center;">
     <el-col :lg="12">

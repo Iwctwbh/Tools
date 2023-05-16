@@ -35,7 +35,7 @@ export const constantRoutes = [
     {
         path: "/Tools/CaseChange",
         name: "大小写 CaseChange",
-        component: () => import("../views/CaseChange.vue")
+        component: () => import("../views/CaseConvert.vue")
     },
     {
         path: "/Tools/NumberGuess",

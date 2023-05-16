@@ -33,6 +33,11 @@ Text difference comparison.
 UUID生成，随机数生成。
 UUID create, random number create.
 
+#### [大小写转换 CaseConvert](https://iwctwbh.github.io/Tools/CaseConvert)
+
+大小写转换，驼峰转换。
+Case convert, camel case convert.
+
 #### [正则替换 RegexReplace](https://iwctwbh.github.io/Tools/RegexReplace)
 
 开发中。
