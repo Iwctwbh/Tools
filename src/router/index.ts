@@ -33,8 +33,8 @@ export const constantRoutes = [
         component: () => import("../views/RegexReplace.vue")
     },
     {
-        path: "/Tools/CaseChange",
-        name: "大小写 CaseChange",
+        path: "/Tools/CaseConvert",
+        name: "大小写转换 CaseConvert",
         component: () => import("../views/CaseConvert.vue")
     },
     {
