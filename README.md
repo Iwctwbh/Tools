@@ -38,6 +38,11 @@ UUID create, random number create.
 大小写转换，驼峰转换。
 Case convert, camel case convert.
 
+### [Markdown编辑器 MdEditor](https://iwctwbh.github.io/Tools/MdEditor)
+
+Markdown编辑器，支持实时预览。
+Markdown editor, support real-time preview.
+
 #### [正则替换 RegexReplace](https://iwctwbh.github.io/Tools/RegexReplace)
 
 开发中。
