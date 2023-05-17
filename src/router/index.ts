@@ -38,6 +38,11 @@ export const constantRoutes = [
         component: () => import("../views/CaseConvert.vue")
     },
     {
+        path: "/Tools/MdEditor",
+        name: "Markdown编辑器 MdEditor",
+        component: () => import("../views/MdEditor.vue")
+    },
+    {
         path: "/Tools/NumberGuess",
         name: "猜数游戏 NumberGuess",
         component: () => import("../views/NumberGuess.vue")
