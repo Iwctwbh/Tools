@@ -3,130 +3,142 @@
     UUID生成 UUIDCreate
   </h1>
 
-  <el-row style="justify-content: center;">
-    <el-col span="5" style="text-align: center;">
-      <div>
-        <label>数量 Count&nbsp;</label>
-        <el-input-number
-            v-model="UUIDCountNumber"
-            max="999"
-            min="1"
-            size="large"
-        ></el-input-number>
-      </div>
-      <el-button
-          size="large"
-          type="primary"
-          @click="btnUUIDCreate"
-      >
-        UUID生成 UUIDCreate
-      </el-button>
+  <el-row style="justify-content: space-between;">
+    <el-col :lg="11" style="">
+      <el-row style="text-align: center;">
+        <el-col :lg="12" style="margin: 0 0 10px 0;">
+          数量 Count :
+          <el-input-number
+              v-model="RandomCountNumber"
+              max="999"
+              min="1"
+              size="large">
+          </el-input-number>
+        </el-col>
+        <el-col :lg="12">
+          <el-button style=""
+                     size="large"
+                     type="primary"
+                     @click="btnUUIDCreate">
+            UUID生成 UUIDCreate
+          </el-button>
+        </el-col>
+      </el-row>
+      <el-row style="min-height: 50px;">
+        <el-col span="24">
+        </el-col>
+      </el-row>
+      <el-row style="padding-top: 10px; justify-content: center;">
+        <el-col :lg="24" style="text-align: center;margin: 0 0 10px 0;">
+          <el-input
+              id="textareaOutuuid"
+              v-model="textareaOutuuid"
+              :autosize="{ minRows: 15, maxRows: 30 }"
+              readonly
+              size="large"
+              type="textarea"></el-input>
+        </el-col>
+      </el-row>
+    </el-col>
+    <el-col :lg="11" style="">
+      <el-row style="text-align: center;">
+        <el-col :lg="12" style="margin: 0 0 10px 0;">
+          数量 Count
+          <el-input-number
+              v-model="RandomCountNumber"
+              max="999"
+              min="1"
+              size="large"
+              style="float: right;">
+          </el-input-number>
+        </el-col>
+        <el-col :lg="12">
+          位数 Digit
+          <el-input-number
+              v-model="DigitCountNumber"
+              min="1"
+              size="large"
+              style="float: right;">
+          </el-input-number>
+        </el-col>
+        <el-col :lg="12" style="padding-top: 10px;">
+          <div style="display: flex; justify-content: center;">
+            <div id="divCase">
+              <el-checkbox id="isCaseUpper"
+                           v-model="isCaseUpper"
+                           border
+                           class=""
+                           title="全大写">
+                <strong style="font-size: 20px;">
+                  A
+                </strong>
+              </el-checkbox>
+
+              <el-checkbox id="isCaseInsensitive"
+                           v-model="isCaseInsensitive"
+                           border
+                           class="center"
+                           title="不区分大小写">
+                <strong style="font-size: 20px;">
+                  Aa
+                </strong>
+              </el-checkbox>
+
+              <el-checkbox id="isCaseLower"
+                           v-model="isCaseLower"
+                           border
+                           class=""
+                           title="全小写">
+                <strong style="font-size: 20px;">
+                  a
+                </strong>
+              </el-checkbox>
+            </div>
+            &nbsp;
+            <el-checkbox id="hasNumber"
+                         v-model="isHasNumber"
+                         border
+                         class=""
+                         title="是否含有数字">
+              <strong style="font-size: 20px;">
+                0-9
+              </strong>
+            </el-checkbox>
+            &nbsp;
+            <el-checkbox id="has"
+                         v-model="isHasSpecialSymbols"
+                         border
+                         class=""
+                         title="是否含有特殊符号">
+              <strong style="font-size: 20px;">
+                !@#
+              </strong>
+            </el-checkbox>
+            &nbsp;
+          </div>
+        </el-col>
+        <el-col :lg="12" style="padding-top: 10px;">
+          <el-button
+              style=""
+              size="large"
+              type="primary"
+              @click="btnRandomCreate">
+            随机数生成 RandomNumberCreate
+          </el-button>
+        </el-col>
+        <el-col :lg="24" style="text-align: center;padding-top: 10px;">
+          <el-input
+              id="textareaOut"
+              v-model="textareaOut"
+              :autosize="{ minRows: 15, maxRows: 30 }"
+              readonly
+              size="large"
+              type="textarea"></el-input>
+        </el-col>
+      </el-row>
     </el-col>
   </el-row>
 
-  <el-row style="justify-content: center;">
-    <el-col span="5" style="text-align: center;">
-      数量 Count
-      <el-input-number
-          v-model="RandomCountNumber"
-          max="999"
-          min="1"
-          size="large"
-      ></el-input-number>
-      &nbsp;
-      位数 Digit
-      <el-input-number
-          v-model="DigitCountNumber"
-          min="1"
-          size="large"
-      ></el-input-number>
-      &nbsp;
-      <div style="display: flex; justify-content: center;">
-        <div id="divCase">
-          <el-checkbox
-              id="isCaseUpper"
-              v-model="isCaseUpper"
-              border
-              class=""
-              title="全大写"
-          >
-            <strong style="font-size: 20px;">
-              A
-            </strong>
-          </el-checkbox>
-
-          <el-checkbox
-              id="isCaseInsensitive"
-              v-model="isCaseInsensitive"
-              border
-              class="center"
-              title="不区分大小写"
-          >
-            <strong style="font-size: 20px;">
-              Aa
-            </strong>
-          </el-checkbox>
-
-          <el-checkbox
-              id="isCaseLower"
-              v-model="isCaseLower"
-              border
-              class=""
-              title="全小写"
-          >
-            <strong style="font-size: 20px;">
-              a
-            </strong>
-          </el-checkbox>
-        </div>
-        &nbsp;
-        <el-checkbox
-            id="hasNumber"
-            v-model="isHasNumber"
-            border
-            class=""
-            title="是否含有数字"
-        >
-          <strong style="font-size: 20px;">
-            0-9
-          </strong>
-        </el-checkbox>
-        &nbsp;
-        <el-checkbox
-            id="has"
-            v-model="isHasSpecialSymbols"
-            border
-            class=""
-            title="是否含有特殊符号"
-        >
-          <strong style="font-size: 20px;">
-            !@#
-          </strong>
-        </el-checkbox>
-        &nbsp;
-      </div>
-      <el-button
-          size="large"
-          type="primary"
-          @click="btnRandomCreate"
-      >
-        随机数生成 RandomNumberCreate
-      </el-button>
-    </el-col>
-  </el-row>
-
-  <el-row style="padding-top: 10px; justify-content: center;">
-    <el-col :lg="8" style="text-align: center;">
-      <el-input
-          id="textareaOut"
-          v-model="textareaOut"
-          :autosize="{ minRows: 15, maxRows: 30 }"
-          readonly
-          size="large"
-          type="textarea"
-      ></el-input>
-    </el-col>
-  </el-row>
 </template>
 
 <style>
@@ -167,6 +179,7 @@ import { ref, watch } from "vue";
 // Init
 let sloth: any = {}; // 是否使用命名空间？
 
+const textareaOutuuid = ref<string>("");
 const textareaOut = ref<string>("");
 const UUIDCountNumber = ref<number>(1);
 const RandomCountNumber = ref<number>(1);
@@ -185,10 +198,10 @@ const arrayUpper: string[] = arrayLower.map((item: string) => item.toUpperCase()
 // Event
 const btnUUIDCreate = () => {
   let uuidArray: string[] = [];
-  for (let i = 0; i < UUIDCountNumber.value; ++i) {
+  for (let i = 0; i < RandomCountNumber.value; ++i) {
     uuidArray.push(uuid());
   }
-  textareaOut.value = uuidArray.join("\n");
+  textareaOutuuid.value = uuidArray.join("\n");
 };
 
 const btnRandomCreate = () => {
