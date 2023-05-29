@@ -9,7 +9,7 @@
         <el-col :lg="12" style="margin: 0 0 10px 0;">
           数量 Count :
           <el-input-number
-              v-model="RandomCountNumber"
+              v-model="UUIDCountNumber"
               max="999"
               min="1"
               size="large">
@@ -62,7 +62,7 @@
           </el-input-number>
         </el-col>
         <el-col :lg="12" style="padding-top: 10px;">
-          <div style="display: flex; justify-content: center;">
+          <div style="display: flex; justify-content: center; white-space: nowrap;">
             <div id="divCase">
               <el-checkbox id="isCaseUpper"
                            v-model="isCaseUpper"
@@ -198,7 +198,7 @@ const arrayUpper: string[] = arrayLower.map((item: string) => item.toUpperCase()
 // Event
 const btnUUIDCreate = () => {
   let uuidArray: string[] = [];
-  for (let i = 0; i < RandomCountNumber.value; ++i) {
+  for (let i = 0; i < UUIDCountNumber.value; ++i) {
     uuidArray.push(uuid());
   }
   textareaOutuuid.value = uuidArray.join("\n");
