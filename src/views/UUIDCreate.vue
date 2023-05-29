@@ -16,10 +16,11 @@
           </el-input-number>
         </el-col>
         <el-col :lg="12">
-          <el-button style=""
-                     size="large"
-                     type="primary"
-                     @click="btnUUIDCreate">
+          <el-button
+              style=""
+              size="large"
+              type="primary"
+              @click="btnUUIDCreate">
             UUID生成 UUIDCreate
           </el-button>
         </el-col>
@@ -64,52 +65,57 @@
         <el-col :lg="12" style="padding-top: 10px;">
           <div style="display: flex; justify-content: center; white-space: nowrap;">
             <div id="divCase">
-              <el-checkbox id="isCaseUpper"
-                           v-model="isCaseUpper"
-                           border
-                           class=""
-                           title="全大写">
+              <el-checkbox
+                  id="isCaseUpper"
+                  v-model="isCaseUpper"
+                  border
+                  class=""
+                  title="全大写">
                 <strong style="font-size: 20px;">
                   A
                 </strong>
               </el-checkbox>
 
-              <el-checkbox id="isCaseInsensitive"
-                           v-model="isCaseInsensitive"
-                           border
-                           class="center"
-                           title="不区分大小写">
+              <el-checkbox
+                  id="isCaseInsensitive"
+                  v-model="isCaseInsensitive"
+                  border
+                  class="center"
+                  title="不区分大小写">
                 <strong style="font-size: 20px;">
                   Aa
                 </strong>
               </el-checkbox>
 
-              <el-checkbox id="isCaseLower"
-                           v-model="isCaseLower"
-                           border
-                           class=""
-                           title="全小写">
+              <el-checkbox
+                  id="isCaseLower"
+                  v-model="isCaseLower"
+                  border
+                  class=""
+                  title="全小写">
                 <strong style="font-size: 20px;">
                   a
                 </strong>
               </el-checkbox>
             </div>
             &nbsp;
-            <el-checkbox id="hasNumber"
-                         v-model="isHasNumber"
-                         border
-                         class=""
-                         title="是否含有数字">
+            <el-checkbox
+                id="hasNumber"
+                v-model="isHasNumber"
+                border
+                class=""
+                title="是否含有数字">
               <strong style="font-size: 20px;">
                 0-9
               </strong>
             </el-checkbox>
             &nbsp;
-            <el-checkbox id="has"
-                         v-model="isHasSpecialSymbols"
-                         border
-                         class=""
-                         title="是否含有特殊符号">
+            <el-checkbox
+                id="has"
+                v-model="isHasSpecialSymbols"
+                border
+                class=""
+                title="是否含有特殊符号">
               <strong style="font-size: 20px;">
                 !@#
               </strong>
@@ -174,7 +180,7 @@
 
 <script lang="ts" setup>
 // Import
-import { ref, watch } from "vue";
+import {ref, watch} from "vue";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
