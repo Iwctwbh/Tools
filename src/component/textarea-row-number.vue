@@ -60,7 +60,7 @@ const textarea = ref<string>("");
 // 监听textarea的变化
 watch(textarea, (): void => {
   let rowNumber: number = textarea.value.split('\n').length;
-  textRowNumber.value = [...Array(rowNumber).keys()].join('\n');
+  textRowNumber.value = [...Array(rowNumber)].map((item, index) => index + 1).join('\n');
 }); // 监听textarea的变化
 
 // Mounted
@@ -69,11 +69,12 @@ onMounted(() => {
     textareaDom = document.getElementById(textareaId.value);
     textRowNumberDom = document.getElementById(textRowNumberId.value);
     textareaDom!.addEventListener('scroll', (e) => textRowNumberDom!.scrollTop = textareaDom!.scrollTop);
+    textRowNumberDom!.addEventListener('scroll', (e) => textareaDom!.scrollTop = textRowNumberDom!.scrollTop);
   });
 })
 
 // Expose
-defineExpose({textarea});
+defineExpose({textValue: textarea.value});
 </script>
 
 <style scoped>
