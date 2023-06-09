@@ -74,7 +74,7 @@ onMounted(() => {
 })
 
 // Expose
-defineExpose({textValue: textarea.value});
+defineExpose({textValue: textarea});
 </script>
 
 <style scoped>
