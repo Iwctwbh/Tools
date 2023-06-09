@@ -1,6 +1,6 @@
 <template>
-  <el-row>
-    <el-col :span="2">
+  <el-row style="padding-top: 20px">
+    <el-col :span="2" style="max-width: 50px;">
       <el-input
         :id="textRowNumberId"
         type="textarea"
@@ -9,6 +9,7 @@
         resize="none"
         :autosize="{ minRows: 15, maxRows: 15 }"
         style="width: 100%;"
+        class="blackshopClass"
       />
     </el-col>
     <el-col :span="22">
@@ -19,6 +20,7 @@
         resize="none"
         :autosize="{ minRows: 15, maxRows: 15 }"
         style="width: 100%;"
+        class="right_textarea"
       />
     </el-col>
   </el-row>
@@ -77,6 +79,13 @@ onMounted(() => {
 defineExpose({textValue: textarea});
 </script>
 
-<style scoped>
-
+<style>
+.blackshopClass .el-textarea__inner {
+  overflow: hidden;
+  background-color: #ececec;
+  color: #000000;
+}
+.right_textarea .el-textarea__inner{
+  white-space: nowrap;
+}
 </style>
