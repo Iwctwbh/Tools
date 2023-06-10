@@ -73,8 +73,8 @@ onMounted(() => {
   nextTick(() => {
     textareaDom = document.getElementById(textareaId.value);
     textRowNumberDom = document.getElementById(textRowNumberId.value);
-    textareaDom!.addEventListener('scroll', (e) => textRowNumberDom!.scrollTop = textareaDom!.scrollTop);
-    textRowNumberDom!.addEventListener('scroll', (e) => textareaDom!.scrollTop = textRowNumberDom!.scrollTop);
+    textareaDom!.addEventListener('scroll', () => textRowNumberDom!.scrollTop = textareaDom!.scrollTop);
+    textRowNumberDom!.addEventListener('scroll', () => textareaDom!.scrollTop = textRowNumberDom!.scrollTop);
   });
 })
 

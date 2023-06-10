@@ -43,18 +43,13 @@
 
 <script lang='ts' setup>
 import {ref} from "vue";
+import vkbeautify from "vkbeautify";
 import TextareaRowNumber from "../component/textarea-row-number.vue";
 
 const areaText = ref();
 const areaText2 = ref();
-const btnDecompression = (e: any): void => {
-  let formatted = areaText2.value.textValue.replace(new RegExp(/>/ig), ">\n")
-    .replace(new RegExp(/</ig), "\n<")
-    .replace(new RegExp(/(\n\n)+/g), "\n")
-    .replace(new RegExp(/^\n/g), "")
-    .replace(new RegExp(/\n$/g), "");
-  areaText.value.textValue = "";
-  areaText.value.textValue = formatted;
+const btnDecompression = (): void => {
+  areaText.value.textValue = vkbeautify.xml(areaText2.value.textValue);
 };
 
 const btnCompress = (): void => {
@@ -64,10 +59,10 @@ const btnCompress = (): void => {
     return;
   }
   areaText2.value.textValue = source.replace(new RegExp(/\n+/g), "")
-    .replace(new RegExp(/<!--.*?-->/ig), "")
+    //.replace(new RegExp(/<!--.*?-->/ig), "")
     .replace(new RegExp(/\/\*.*?\*\//ig), "")
-    .replace(new RegExp(/> +/ig), ">")
-    .replace(new RegExp(/ +</ig), "<");
+    .replace(new RegExp(/>\s{2,}/ig), ">")
+    .replace(new RegExp(/\s{2,}</ig), "<");
 };
 </script>
 
