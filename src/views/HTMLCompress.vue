@@ -25,7 +25,6 @@
   <el-row style="justify-content: center;">
     <el-col :lg="12">
       <textarea-row-number
-        :element-id="el_left_ID"
         ref="areaText"
         style="overflow: hidden"
       >
@@ -34,7 +33,7 @@
 
     <el-col :lg="12">
       <textarea-row-number
-        :element-id="el_right_ID"
+        :textarea-id="'textareaOut'"
         ref="areaText2"
       >
       </textarea-row-number>
@@ -48,8 +47,6 @@ import TextareaRowNumber from "../component/textarea-row-number.vue";
 
 const areaText = ref();
 const areaText2 = ref();
-const el_left_ID = ref<string>("leftareaText");
-const el_right_ID = ref<string>("rightareaText");
 const btnDecompression = (e: any): void => {
   let formatted = areaText2.value.textValue.replace(new RegExp(/>/ig), ">\n")
     .replace(new RegExp(/</ig), "\n<")

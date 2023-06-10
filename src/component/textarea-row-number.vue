@@ -37,7 +37,8 @@ let textRowNumberDom: HTMLElement | null = null;
 let textareaDom: HTMLElement | null = null;
 
 // Export
-export interface iProps {
+// export interface iProps build会报错
+interface iProps {
   textareaId?: string;
   textRowNumberId?: string;
   textarea?: string;
@@ -51,6 +52,8 @@ const props = withDefaults(defineProps<iProps>(), {
     .toString(36)
     .substring(2)
 });
+
+// const {textareaId=""} = defineProps<iProps>();
 
 // Bind Value
 const textareaId = computed<string>(() => props.textareaId);
