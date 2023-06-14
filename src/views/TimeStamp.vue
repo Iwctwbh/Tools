@@ -181,7 +181,6 @@
 <script lang='ts' setup>
 import {ref} from "vue";
 import moment, {months} from "moment";
-import {formatTime} from "element-plus/es/components/countdown/src/utils";
 
 const textareaIn0 = ref<number>();
 const textareaIn1 = ref<string>("");
@@ -210,15 +209,6 @@ const btnEmpty = (): void => {
 
 };
 
-const value1 = ref(new Date(2016, 9, 10, 18, 30))
-
-const makeRange = (start: number, end: number) => {
-  const result: number[] = []
-  for (let i = start; i <= end; i++) {
-    result.push(i)
-  }
-  return result
-}
 let featureTime: any;
 const btnStarttiming = (): void => {
   debugger
@@ -240,9 +230,6 @@ const btnStarttiming = (): void => {
   count = h + m + s;
   featureTime = moment().add(count, "seconds")
   timer = setInterval(() => {
-      // var aa: number = count -= 1
-      // featureTime = moment().add(aa,"seconds").format("HH:mm:ss");
-      debugger
       moment().diff(featureTime)
       hour.value = featureTime.diff(moment(), 'hour')
       minute.value = featureTime.diff(moment().add(hour.value, 'hour'), 'minutes')
