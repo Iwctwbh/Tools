@@ -94,24 +94,21 @@
             <div class="jumbotron text-center countdown_time"
                  style="text-align: center">
               <div class="container">
-                <label for="hour">时:</label>
                 <el-input id="hour"
                           v-model="hour"
                           class="try8-input countdown_timer_input">
                 </el-input>
-                <label for="minute">分:</label>
+                <label for="hour">时</label>
                 <el-input id="minute"
                           v-model="minute"
                           class="try8-input countdown_timer_input">
                 </el-input>
-                <label for="second">秒:</label>
+                <label for="minute">分</label>
                 <el-input id="second"
                           v-model="second"
                           class="try8-input countdown_timer_input">
-
                 </el-input>
-                <!--                  <br>-->
-                <!--                  <span class="badge badge-secondary countdown_badge">共计：0</span>-->
+                <label for="second">秒</label>
               </div>
             </div>
           </el-col>
@@ -230,16 +227,15 @@ const btnStarttiming = (): void => {
   count = h + m + s;
   featureTime = moment().add(count, "seconds")
   timer = setInterval(() => {
-      moment().diff(featureTime)
       hour.value = featureTime.diff(moment(), 'hour')
       minute.value = featureTime.diff(moment().add(hour.value, 'hour'), 'minutes')
       second.value = featureTime.diff(moment().add(featureTime.diff(moment(), 'minutes'), 'minutes'), 'seconds')
       if (hour.value == "0" && minute.value == "0" && second.value == "0") {
         clearTimeout(timer);
-        alert("时间到了，请刷新！！！")
+        alert("倒计时结束，请刷新！！！")
       }
     },
-    1000);
+    100);
 }
 const btnTimeEmpty = (): void => {
   clearTimeout(timer);
