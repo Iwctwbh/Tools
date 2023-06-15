@@ -11,7 +11,7 @@
             <span>时间戳转换工具</span>
           </div>
         </template>
-        <el-row :gutter="20">
+        <el-row :gutter="20" style=" padding-bottom: 10px;">
           <el-col :lg="6">
             <el-button
               style=""
@@ -43,7 +43,7 @@
           </el-col>
         </el-row>
         <el-row :gutter="20"
-                style="margin-top: 20px;">
+                style=" padding-bottom: 10px;">
           <el-col :lg="12">
             <div>
               <el-input
@@ -67,7 +67,8 @@
               />
             </div>
           </el-col>
-
+        </el-row>
+        <el-row :gutter="20">
           <el-col :lg="12">
             <div class="demo-date-picker">
               <el-date-picker
@@ -184,6 +185,120 @@
               <span>时间计算器</span>
             </div>
           </template>
+          <el-row
+            style="background-color: #e9ecef;
+            padding-bottom: 10px;">
+            <el-col :lg="10">
+              <div class="input-group-prepend">
+                <label for="point_begin_time" class="input-group-text try8-input">开始时间</label>
+                <el-date-picker
+                  v-model="Starttimevalue"
+                  id="Starttimevalue"
+                  type="datetime"
+                  v-on:change="StartTimeFillValue"
+                  placeholder="Please select a start time"
+                />
+              </div>
+            </el-col>
+            <el-col :lg="3"></el-col>
+            <el-col :lg="11">
+              <div class="input-group-prepend">
+                <el-input
+                  id="Starttimestamp"
+                  v-model="Starttimestamp"
+                  placeholder="Please enter the start timestamp"
+                  oninput="value=value.replace(/[^0-9]/g, '')"
+                  v-on:change="StartTimestampValue"
+                >
+                  <template #prepend>开始时间戳</template>
+                </el-input>
+              </div>
+            </el-col>
+          </el-row>
+
+          <el-row style="background-color: #e9ecef;
+            padding-bottom: 10px;">
+            <el-col :lg="10">
+              <div class="input-group-prepend">
+                <label for="point_begin_time" class="input-group-text try8-input">结束时间</label>
+                <el-date-picker
+                  v-model="Endtimevalue"
+                  id="Endtimevalue"
+                  type="datetime"
+                  v-on:change="EndTimeFillValue"
+                  placeholder="Please select the end time"
+                />
+              </div>
+            </el-col>
+            <el-col :lg="3"></el-col>
+            <el-col :lg="11">
+              <div class="input-group-prepend">
+                <el-input
+                  id="timestamp_value"
+                  v-model="Endtimestampvalue"
+                  placeholder="Please enter the end timestamp"
+                  oninput="value=value.replace(/[^0-9]/g, '')"
+                  v-on:change="EndTimestampValue"
+                >
+                  <template #prepend>结束时间戳</template>
+                </el-input>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row style="background-color: #e9ecef;
+            padding-bottom: 10px;">
+            <el-col :lg="11">
+              <el-button
+                style=""
+                size="large"
+                type="primary"
+                @click="btnStartcalculationtime"
+              >
+                开始计算
+              </el-button>
+            </el-col>
+            <el-col :lg="11">
+            </el-col>
+            <el-col :lg="2">
+              <el-button
+                style="padding:15px"
+                size="large"
+                type="primary"
+                @click="btnEmpty"
+              >
+                清空
+              </el-button>
+            </el-col>
+          </el-row>
+
+          <el-row style="background-color: #e9ecef;
+            padding-bottom: 10px;">
+            <el-col :lg="10">
+              <div class="input-group-prepend">
+                <el-input
+                  id="timestamp_value"
+                  v-model="Timepvalue"
+                  placeholder="Please enter a timestamp"
+                  readonly
+                >
+                  <template #prepend>时间</template>
+                </el-input>
+              </div>
+            </el-col>
+            <el-col :lg="3"></el-col>
+            <el-col :lg="11">
+              <div class="input-group-prepend">
+                <el-input
+                  id="timestamp_value"
+                  v-model="Stampvalue"
+                  placeholder="Please enter a timestamp"
+                  readonly
+                >
+                  <template #prepend>时间戳</template>
+                </el-input>
+              </div>
+            </el-col>
+          </el-row>
         </el-card>
       </el-space>
     </el-col>
@@ -205,13 +320,21 @@
 <script lang='ts' setup>
 import {ref} from "vue";
 import moment, {months} from "moment";
+import _ from "lodash";
 
 const textareaIn0 = ref<number>();
+const Timestampvalue = ref<number>();
 const textareaIn1 = ref<string>("");
 const second = ref<string>("00");
 const minute = ref<string>("00");
 const hour = ref<string>("00");
 const datatimeValue = ref('')
+const Starttimevalue = ref('')
+const Starttimestamp = ref('')
+const Timepvalue = ref('')
+const Stampvalue = ref('')
+const Endtimevalue = ref('')
+const Endtimestampvalue = ref('')
 const timeValue = ref('')
 const btnTimeClickdisabled = ref<boolean>(false)
 const btnSuspenddisabled = ref<boolean>(true)
@@ -297,6 +420,33 @@ const btnSuspend = (): void => {
   alert("倒计时暂停！！！")
 };
 
+const btnStartcalculationtime = (): void => {
+  Stampvalue.value = "123";
+  Timepvalue.value = "123";
+};
+
+function StartTimeFillValue() {
+  Starttimestamp.value = moment(Starttimevalue.value).unix().toString();
+}
+
+function StartTimestampValue() {
+  debugger
+  let starttimestamp: number = _.toNumber(Starttimestamp.value);
+  Starttimevalue.value = moment(moment.unix(starttimestamp).utc()).format('YYYY-MM-DD HH:mm:ss');
+
+}
+
+function EndTimeFillValue() {
+  Endtimestampvalue.value = moment(Endtimevalue.value).unix().toString();
+}
+
+function EndTimestampValue() {
+  debugger
+  let endtimestampvalue: number = _.toNumber(Endtimestampvalue.value);
+  Endtimevalue.value = moment(moment.unix(endtimestampvalue).utc()).format('YYYY-MM-DD HH:mm:ss');
+
+}
+
 function Validatehours() {
   hour.value = hour.value.replace(new RegExp(/[a-z]|[A-Z]|2[5-9]|[3-9]\d|[^\w\u4E00-\u9FA5]/g), (r) => r.length > 1 ? r.substring(0, 1) : '');
 }
@@ -318,13 +468,7 @@ function ValidateSeconds() {
 }
 
 .box-card {
-  width: 800px
-}
-
-.el_input_readonly {
-  .el-input__wrapper {
-    background-color: #e9ecef;
-  }
+  width: 800px;
 }
 
 .countdown_timer_input .el-input__wrapper {
@@ -358,5 +502,47 @@ function ValidateSeconds() {
   width: 180px;
   color: #fff;
   background-color: #6c757d;
+}
+
+.try8-input {
+  border: 1px solid #ced4da;
+  font-size: 13px;
+  height: auto;
+}
+
+.input-group-text {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  margin-bottom: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  text-align: center;
+  white-space: nowrap;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+.input-group-prepend {
+  display: -ms-flexbox;
+  display: flex;
+  height: 100%;
+}
+
+.input-group-prepend {
+  .el-input {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.el-card__body {
+  background-color: rgb(233, 236, 239);
+  height: 100%;
 }
 </style>
