@@ -90,23 +90,45 @@
           </div>
         </template>
         <el-row style="background-color: #e9ecef;">
+          <el-col :lg="12">
+            <el-col :lg="12">
+              <div class="demo-date-picker">
+                <el-time-picker
+                  v-model="timeValue"
+                  type="datetime"
+                  placeholder="Please select a time"
+                />
+              </div>
+            </el-col>
+          </el-col>
           <el-col>
             <div class="jumbotron text-center countdown_time"
                  style="text-align: center">
               <div class="container">
-                <el-input id="hour"
-                          v-model="hour"
-                          class="try8-input countdown_timer_input">
+                <el-input
+                  id="hour"
+                  v-model="hour"
+                  maxlength="2"
+                  class="try8-input countdown_timer_input"
+                  v-on:input="Validatehours"
+                >
                 </el-input>
                 <label for="hour">时</label>
-                <el-input id="minute"
-                          v-model="minute"
-                          class="try8-input countdown_timer_input">
+                <el-input
+                  id="minute"
+                  v-model="minute"
+                  maxlength="2"
+                  v-on:input="ValidateMinutes"
+                  class="try8-input countdown_timer_input
+                ">
                 </el-input>
                 <label for="minute">分</label>
-                <el-input id="second"
-                          v-model="second"
-                          class="try8-input countdown_timer_input">
+                <el-input
+                  id="second"
+                  v-model="second"
+                  maxlength="2"
+                  v-on:input="ValidateSeconds"
+                  class="try8-input countdown_timer_input">
                 </el-input>
                 <label for="second">秒</label>
               </div>
@@ -119,7 +141,9 @@
               style=""
               size="large"
               type="primary"
-              @click="btnStarttiming">
+              :disabled="btnTimeClickdisabled"
+              @click="btnStarttiming"
+            >
               开始计时
             </el-button>
           </el-col>
@@ -129,7 +153,9 @@
               style=""
               size="large"
               type="primary"
-              @click="btnSuspend">
+              :disabled="btnSuspenddisabled"
+              @click="btnSuspend"
+            >
               暂停
             </el-button>
           </el-col>
@@ -139,7 +165,8 @@
               style=""
               size="large"
               type="primary"
-              @click="btnTimeEmpty">
+              @click="btnTimeEmpty"
+            >
               清空
             </el-button>
           </el-col>
@@ -185,6 +212,9 @@ const second = ref<string>("00");
 const minute = ref<string>("00");
 const hour = ref<string>("00");
 const datatimeValue = ref('')
+const timeValue = ref('')
+const btnTimeClickdisabled = ref<boolean>(false)
+const btnSuspenddisabled = ref<boolean>(true)
 let timer: any = null
 const btnTimeStamp = (): void => {
   if (textareaIn0.value != null) {
@@ -197,7 +227,6 @@ const btnTimeStamp = (): void => {
 };
 const btnTime = (): void => {
   let timestampIn1 = datatimeValue.value
-  debugger
   const data = moment(timestampIn1).unix().toString();
   textareaIn1.value = "";
   textareaIn1.value = data;
@@ -208,7 +237,12 @@ const btnEmpty = (): void => {
 
 let featureTime: any;
 const btnStarttiming = (): void => {
-  debugger
+  if (!btnTimeClickdisabled.value) {
+    btnTimeClickdisabled.value = true;
+  }
+  if (btnSuspenddisabled.value) {
+    btnSuspenddisabled.value = false
+  }
   let datehourTime: number;
   let dateminuteTime: number;
   let datesecondTime: number;
@@ -216,8 +250,14 @@ const btnStarttiming = (): void => {
   let m;
   let s;
   let count: number;
-  let dataTime = hour.value + ":" + minute.value + ":" + second.value;
-
+  let dataTime;
+  let timevalueinfo = moment(timeValue.value).format('HH:mm:ss');
+  debugger
+  if (timevalueinfo == '' || timevalueinfo == "Invalid date") {
+    dataTime = hour.value + ":" + minute.value + ":" + second.value;
+  } else {
+    dataTime = timevalueinfo;
+  }
   datehourTime = moment.duration(dataTime).hours();
   dateminuteTime = moment.duration(dataTime).minutes();
   datesecondTime = moment.duration(dataTime).seconds();
@@ -232,22 +272,42 @@ const btnStarttiming = (): void => {
       second.value = featureTime.diff(moment().add(featureTime.diff(moment(), 'minutes'), 'minutes'), 'seconds')
       if (hour.value == "0" && minute.value == "0" && second.value == "0") {
         clearTimeout(timer);
-        alert("倒计时结束，请刷新！！！")
+        alert("倒计时结束 !!!")
+        window.location.reload();
       }
     },
     100);
 }
 const btnTimeEmpty = (): void => {
   clearTimeout(timer);
-  hour.value = "00"
-  minute.value = "00"
-  second.value = "00"
+  hour.value = "00";
+  minute.value = "00";
+  second.value = "00";
+  timeValue.value = ""
 };
 
 const btnSuspend = (): void => {
+  if (btnTimeClickdisabled.value) {
+    btnTimeClickdisabled.value = false;
+  }
+  if (!btnSuspenddisabled.value) {
+    btnSuspenddisabled.value = true;
+  }
   clearTimeout(timer);
   alert("倒计时暂停！！！")
 };
+
+function Validatehours() {
+  hour.value = hour.value.replace(new RegExp(/[a-z]|[A-Z]|2[5-9]|[3-9]\d|[^\w\u4E00-\u9FA5]/g), (r) => r.length > 1 ? r.substring(0, 1) : '');
+}
+
+function ValidateMinutes() {
+  minute.value = minute.value.replace(/[a-z]|[A-Z]|[6-9]\d|[^\w\u4E00-\u9FA5]/g, (r) => r.length > 1 ? r.substring(0, 1) : '')
+}
+
+function ValidateSeconds() {
+  second.value = second.value.replace(/[a-z]|[A-Z]|[6-9]\d|[^\w\u4E00-\u9FA5]/g, (r) => r.length > 1 ? r.substring(0, 1) : '')
+}
 </script>
 
 <style>
@@ -278,10 +338,6 @@ const btnSuspend = (): void => {
   .el-tooltip__trigger {
     width: 100%;
   }
-}
-
-.countdown_time {
-  padding: 50px 0 20px;
 }
 
 .countdown_time .countdown_timer_input {
