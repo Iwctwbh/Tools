@@ -18,6 +18,8 @@
     "json-formatter-js": "^2.3.4",
     "md-editor-v3": "^2.6.0",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
+    "timezone-picker": "^2.0.0-1",
     "vkbeautify": "^0.99.3",
     "vue": "^3.2.41",
     "vue-router": "^4.1.6"
