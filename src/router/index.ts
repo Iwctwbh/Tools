@@ -48,6 +48,11 @@ export const constantRoutes = [
         component: () => import("../views/HTMLXMLCompress.vue")
     },
     {
+        path: "/Tools/TimeStamp",
+        name: "Tim Management",
+        component: () => import("../views/TimeStamp.vue")
+    },
+    {
         path: "/Tools/NumberGuess",
         name: "猜数游戏 NumberGuess",
         component: () => import("../views/NumberGuess.vue")
