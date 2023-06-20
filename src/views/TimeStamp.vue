@@ -419,6 +419,9 @@ const btnSuspend = (): void => {
 };
 
 const btnStartCalculationTime = (): void => {
+  if (StartTimeValue.value || EndTimeValue.value == "") {
+    return;
+  }
   let startData = moment(StartTimeValue.value).format("YYYY-MM-DD").split("-");
   let endData = moment(EndTimeValue.value).format("YYYY-MM-DD").split("-");
   let startDataObj = new Date(Number(startData[0]), (Number(startData[1]) - 1), Number(startData[2]));
@@ -443,12 +446,11 @@ const btnStartCalculationTime = (): void => {
   let minutes = startMinutesTime - endMinutesTime == 0 ? "00" : startMinutesTime - endMinutesTime;
   let seconds = startSecondsTime - endSecondsTime == 0 ? "00" : startSecondsTime - endSecondsTime;
 
-  if (days == 0) {
-    timeDays = "0000-00-00 ";
-  }
-  let dataTimeValues = timeDays + hours.toString() + ":" + minutes + ":" + seconds.toString().replace("-", "");
+  let dataTimeValues = days + " day " + hours.toString().replace("-", "") + " h: " + minutes.toString().replace("-", "") + " m: " + seconds.toString().replace("-", "") + " s";
+  let Endtimestampvalue;
+  let dataStampValues = _.toNumber(StartTimestamp.value) - _.toNumber(EndTimeStampValue.value);
   timesValue.value = dataTimeValues;
-  StampValue.value = moment(dataTimeValues).unix().toString();
+  StampValue.value = dataStampValues.toString().replace("-", "");
 
 };
 
