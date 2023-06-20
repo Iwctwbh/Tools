@@ -1,6 +1,6 @@
 <template>
   <h1 class="title">
-    Time Stamp
+    Time Calculate
   </h1>
   <el-row :gutter="20">
     <el-col :lg="12">

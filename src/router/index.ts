@@ -49,7 +49,7 @@ export const constantRoutes = [
     },
     {
         path: "/Tools/TimeStamp",
-        name: "Tim Management",
+        name: "时间计算 Time Calculate",
         component: () => import("../views/TimeStamp.vue")
     },
     {
