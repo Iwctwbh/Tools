@@ -50,7 +50,7 @@ export const constantRoutes = [
     {
         path: "/Tools/TimeStamp",
         name: "时间计算 Time Calculate",
-        component: () => import("../views/TimeStamp.vue")
+        component: () => import("../views/TimeCalculate.vue")
     },
     {
         path: "/Tools/NumberGuess",
