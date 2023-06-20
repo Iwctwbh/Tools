@@ -48,7 +48,7 @@ export const constantRoutes = [
         component: () => import("../views/HTMLXMLCompress.vue")
     },
     {
-        path: "/Tools/TimeStamp",
+        path: "/Tools/TimeCalculate",
         name: "时间计算 Time Calculate",
         component: () => import("../views/TimeCalculate.vue")
     },
