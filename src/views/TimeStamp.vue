@@ -302,18 +302,29 @@
             </div>
           </template>
           <el-row>
-            <div class="map">
-              <h3 class="map-label">
-                <span class="map-label-name">Asia/Tomsk</span>
-                <span class="map-label-time">01:33 pm +07</span>
-              </h3>
-              <div class="map-wrap">
-                <div class="map-inset">
-                  <div class="map-axis-x" style="left: 73.6019%;"></div>
-                  <div class="map-axis-y" style="top: 18.6111%;"></div>
-                </div>
-              </div>
-            </div>
+            <el-col :span="10">
+              <el-select
+                v-model="WorldTime"
+                v-on:change="WorldTimeValue"
+                id="WorldTime"
+                class="m-2"
+                placeholder="Please select a time zone"
+                size="large">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-col>
+            <el-col :span="14">
+              <el-input
+                v-model="CurrentTimeZone"
+                style="height: 100%;"
+              >
+              </el-input>
+            </el-col>
           </el-row>
         </el-card>
       </el-space>
@@ -324,25 +335,35 @@
 <script lang='ts' setup>
 import {ref} from "vue";
 import _ from "lodash";
+import moment from "moment-timezone";
 
-import moment from "moment";
+type optionType = {
+  label: string,
+  value: string
+}
 
 const textareaIn0 = ref<number>();
 const textareaIn1 = ref<string>("");
 const second = ref<string>("00");
 const minute = ref<string>("00");
 const hour = ref<string>("00");
-const dataTimeValue = ref("");
-const StartTimeValue = ref("");
-const StartTimestamp = ref("");
-const timesValue = ref("");
-const StampValue = ref("");
-const EndTimeValue = ref("");
-const EndTimeStampValue = ref("");
-const timeValue = ref("");
+const dataTimeValue = ref<string>("");
+const StartTimeValue = ref<string>("");
+const StartTimestamp = ref<string>("");
+const timesValue = ref<string>("");
+const StampValue = ref<string>("");
+const EndTimeValue = ref<string>("");
+const EndTimeStampValue = ref<string>("");
+const timeValue = ref<string>("");
 const btnTimeClickDisabled = ref<boolean>(false);
 const btnSuspendDisabled = ref<boolean>(true);
+const WorldTime = ref<string>("");
+const CurrentTimeZone = ref<string>("");
+let options: Array<optionType> = [];
 let timer: any = null;
+moment.tz.setDefault("zh-cn");
+
+options = moment.tz.names().map((item: string): optionType => ({label: item, value: item}));
 
 const btnTimeStamp = (): void => {
   if (textareaIn0.value != null) {
@@ -484,6 +505,12 @@ function ValidateMinutes() {
 
 function ValidateSeconds() {
   second.value = second.value.replace(/[a-z]|[A-Z]|[6-9]\d|[^\w\u4E00-\u9FA5]/g, (r) => r.length > 1 ? r.substring(0, 1) : "");
+}
+
+function WorldTimeValue() {
+  let currentTime = moment().format();
+  let GMT_current_time = moment(currentTime).tz(WorldTime.value).format();
+  CurrentTimeZone.value = GMT_current_time;
 }
 </script>
 
