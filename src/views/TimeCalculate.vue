@@ -1,6 +1,6 @@
 <template>
   <h1 class="title">
-    Time Calculate
+    Time Stamp
   </h1>
   <el-row :gutter="20">
     <el-col :lg="12">
@@ -90,18 +90,16 @@
             <span>倒计时</span>
           </div>
         </template>
-        <el-row style="background-color: #e9ecef;">
-          <el-col :lg="12">
-            <el-col :lg="12">
-              <div class="demo-date-picker">
-                <el-time-picker
-                  v-model="timeValue"
-                  type="datetime"
-                  placeholder="Please select a time"
-                />
-              </div>
-            </el-col>
-          </el-col>
+        <el-row>
+          <div style="text-align: center;width: 100%;">
+            <el-time-picker
+              v-model="timeValue"
+              type="datetime"
+              placeholder="Please select a time"
+            />
+          </div>
+        </el-row>
+        <el-row style="background-color: #e9ecef">
           <el-col>
             <div class="jumbotron text-center countdown_time"
                  style="text-align: center">
@@ -302,18 +300,29 @@
             </div>
           </template>
           <el-row>
-            <div class="map">
-              <h3 class="map-label">
-                <span class="map-label-name">Asia/Tomsk</span>
-                <span class="map-label-time">01:33 pm +07</span>
-              </h3>
-              <div class="map-wrap">
-                <div class="map-inset">
-                  <div class="map-axis-x" style="left: 73.6019%;"></div>
-                  <div class="map-axis-y" style="top: 18.6111%;"></div>
-                </div>
-              </div>
-            </div>
+            <el-col :span="10">
+              <el-select
+                v-model="WorldTime"
+                v-on:change="WorldTimeValue"
+                id="WorldTime"
+                class="m-2"
+                placeholder="Please select a time zone"
+                size="large">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-col>
+            <el-col :span="14">
+              <el-input
+                v-model="CurrentTimeZone"
+                style="height: 100%;"
+              >
+              </el-input>
+            </el-col>
           </el-row>
         </el-card>
       </el-space>
@@ -322,10 +331,14 @@
 </template>
 
 <script lang='ts' setup>
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import _ from "lodash";
+import moment from "moment-timezone";
 
-import moment from "moment";
+type optionType = {
+  label: string,
+  value: string
+}
 
 const textareaIn0 = ref<number>();
 const textareaIn1 = ref<string>("");
@@ -339,10 +352,18 @@ const timesValue = ref<string>("");
 const StampValue = ref<string>("");
 const EndTimeValue = ref<string>("");
 const EndTimeStampValue = ref<string>("");
-const timeValue = ref<string>("");
+const timeValue = ref<Date>(new Date("1970 00:00:00"));
 const btnTimeClickDisabled = ref<boolean>(false);
 const btnSuspendDisabled = ref<boolean>(true);
+const WorldTime = ref<string>("");
+const CurrentTimeZone = ref<string>("");
+let options: Array<optionType> = [];
 let timer: any = null;
+let watchFlag: boolean = true;
+
+moment.tz.setDefault("zh-cn");
+
+options = moment.tz.names().map((item: string): optionType => ({label: item, value: item}));
 
 const btnTimeStamp = (): void => {
   if (textareaIn0.value != null) {
@@ -374,11 +395,7 @@ const btnStartTiming = (): void => {
   let dateHourTime: number, dateMinuteTime: number, dateSecondTime: number, h: number, m: number, s: number,
     count: number, dataTime: string;
   let timeValueInfo = moment(timeValue.value).format("HH:mm:ss");
-  if (timeValueInfo == "" || timeValueInfo == "Invalid date") {
-    dataTime = hour.value + ":" + minute.value + ":" + second.value;
-  } else {
-    dataTime = timeValueInfo;
-  }
+  dataTime = hour.value + ":" + minute.value + ":" + second.value;
   dateHourTime = moment.duration(dataTime).hours();
   dateMinuteTime = moment.duration(dataTime).minutes();
   dateSecondTime = moment.duration(dataTime).seconds();
@@ -388,13 +405,15 @@ const btnStartTiming = (): void => {
   count = h + m + s;
   featureTime = moment().add(count, "seconds");
   timer = setInterval(() => {
-      hour.value = featureTime.diff(moment(), "hour");
-      minute.value = featureTime.diff(moment().add(hour.value, "hour"), "minutes");
-      second.value = featureTime.diff(moment().add(featureTime.diff(moment(), "minutes"), "minutes"), "seconds");
-      if (hour.value == "0" && minute.value == "0" && second.value == "0") {
+      hour.value = featureTime.diff(moment(), "hour").toString().padStart(2, "0");
+      minute.value = featureTime.diff(moment().add(hour.value, "hour"), "minutes").toString().padStart(2, "0");
+      second.value = featureTime.diff(moment().add(featureTime.diff(moment(), "minutes"), "minutes"), "seconds").toString().padStart(2, "0");
+      if (hour.value == "00" && minute.value == "00" && second.value == "00") {
         clearTimeout(timer);
         alert("倒计时结束 !!!");
-        window.location.reload();
+        if (btnTimeClickDisabled.value) {
+          btnTimeClickDisabled.value = false;
+        }
       }
     },
     100);
@@ -404,7 +423,7 @@ const btnTimeEmpty = (): void => {
   hour.value = "00";
   minute.value = "00";
   second.value = "00";
-  timeValue.value = "";
+  // timeValue.value = new Date("1970 00:00:00");
 };
 
 const btnSuspend = (): void => {
@@ -419,12 +438,15 @@ const btnSuspend = (): void => {
 };
 
 const btnStartCalculationTime = (): void => {
-  let startData = moment(StartTimeValue.value).format("YYYY-MM-DD").split("-");
-  let endData = moment(EndTimeValue.value).format("YYYY-MM-DD").split("-");
-  let startDataObj = new Date(Number(startData[0]), (Number(startData[1]) - 1), Number(startData[2]));
-  let endDataObj = new Date(Number(endData[0]), (Number(endData[1]) - 1), Number(endData[2]));
+  if (StartTimeValue.value === "" || EndTimeValue.value === "") {
+    return;
+  }
+  let startData: Array<string> = moment(StartTimeValue.value).format("YYYY-MM-DD").split("-");
+  let endData: Array<string> = moment(EndTimeValue.value).format("YYYY-MM-DD").split("-");
+  let startDataObj: Date = new Date(Number(startData[0]), (Number(startData[1]) - 1), Number(startData[2]));
+  let endDataObj: Date = new Date(Number(endData[0]), (Number(endData[1]) - 1), Number(endData[2]));
 
-  let t1, t2, dataTime, minusDays, days, timeDays;
+  let t1: number, t2: number, dataTime: number, minusDays: number, days: number;
 
   t1 = startDataObj.getTime();
   t2 = endDataObj.getTime();
@@ -432,56 +454,86 @@ const btnStartCalculationTime = (): void => {
   minusDays = Math.floor(((t2 - t1) / dataTime));
   days = Math.abs(minusDays);
 
-  let startHoursTime = moment.duration(moment(StartTimeValue.value).format("HH:mm:ss")).hours();
-  let startMinutesTime = moment.duration(moment(StartTimeValue.value).format("HH:mm:ss")).minutes();
-  let startSecondsTime = moment.duration(moment(StartTimeValue.value).format("HH:mm:ss")).seconds();
-  let endHoursTime = moment.duration(moment(EndTimeValue.value).format("HH:mm:ss")).hours();
-  let endMinutesTime = moment.duration(moment(EndTimeValue.value).format("HH:mm:ss")).minutes();
-  let endSecondsTime = moment.duration(moment(EndTimeValue.value).format("HH:mm:ss")).seconds();
+  let startHoursTime: number = moment.duration(moment(StartTimeValue.value).format("HH:mm:ss")).hours();
+  let startMinutesTime: number = moment.duration(moment(StartTimeValue.value).format("HH:mm:ss")).minutes();
+  let startSecondsTime: number = moment.duration(moment(StartTimeValue.value).format("HH:mm:ss")).seconds();
+  let endHoursTime: number = moment.duration(moment(EndTimeValue.value).format("HH:mm:ss")).hours();
+  let endMinutesTime: number = moment.duration(moment(EndTimeValue.value).format("HH:mm:ss")).minutes();
+  let endSecondsTime: number = moment.duration(moment(EndTimeValue.value).format("HH:mm:ss")).seconds();
 
-  let hours = startHoursTime - endHoursTime == 0 ? "00" : startHoursTime - endHoursTime;
-  let minutes = startMinutesTime - endMinutesTime == 0 ? "00" : startMinutesTime - endMinutesTime;
-  let seconds = startSecondsTime - endSecondsTime == 0 ? "00" : startSecondsTime - endSecondsTime;
+  let hours: string = startHoursTime - endHoursTime == 0 ? "00" : (startHoursTime - endHoursTime).toString();
+  let minutes: string = startMinutesTime - endMinutesTime == 0 ? "00" : (startMinutesTime - endMinutesTime).toString();
+  let seconds: string = startSecondsTime - endSecondsTime == 0 ? "00" : (startSecondsTime - endSecondsTime).toString();
 
-  if (days == 0) {
-    timeDays = "0000-00-00 ";
-  }
-  let dataTimeValues = timeDays + hours.toString() + ":" + minutes + ":" + seconds.toString().replace("-", "");
+  let dataTimeValues: string = days + " day " + hours.replace("-", "").padStart(2, "0") + " h: " + minutes.replace("-", "").padStart(2, "0") + " m: " + seconds.replace("-", "").padStart(2, "0") + " s";
+  let dataStampValues = _.toNumber(StartTimestamp.value) - _.toNumber(EndTimeStampValue.value);
   timesValue.value = dataTimeValues;
-  StampValue.value = moment(dataTimeValues).unix().toString();
-
+  StampValue.value = dataStampValues.toString().replace("-", "");
 };
 
-function StartTimeFillValue() {
+
+watch([hour, minute, second], (e): void => {
+  if (watchFlag) {
+    console.log("11111");
+    let [h, m, s] = e;
+    timeValue.value = new Date(`1970 ${h}:${m}:${s}`);
+    watchFlag = false;
+    setTimeout(() => {
+      watchFlag = true;
+    }, 100);
+  }
+});
+
+watch(timeValue, (e: Date | undefined): void => {
+  if (watchFlag) {
+    e = e ?? new Date();
+    console.log("11111");
+    hour.value = moment.duration(moment(e).format("HH:mm:ss")).hours().toString();
+    minute.value = moment.duration(moment(e).format("HH:mm:ss")).minutes().toString();
+    second.value = moment.duration(moment(e).format("HH:mm:ss")).seconds().toString();
+    watchFlag = false;
+    setTimeout(() => {
+      watchFlag = true;
+    }, 100);
+  }
+});
+
+function StartTimeFillValue(): void {
   StartTimestamp.value = moment(StartTimeValue.value).unix().toString();
 }
 
-function StartTimestampValue() {
+function StartTimestampValue(): void {
   let startTimestamps: number = _.toNumber(StartTimestamp.value);
   StartTimeValue.value = moment(moment.unix(startTimestamps).utc()).format("YYYY-MM-DD HH:mm:ss");
 
 }
 
-function EndTimeFillValue() {
+function EndTimeFillValue(): void {
   EndTimeStampValue.value = moment(EndTimeValue.value).unix().toString();
 }
 
-function EndTimestampValue() {
+function EndTimestampValue(): void {
   let endTimeStampValue: number = _.toNumber(EndTimeStampValue.value);
   EndTimeValue.value = moment(moment.unix(endTimeStampValue).utc()).format("YYYY-MM-DD HH:mm:ss");
 
 }
 
-function ValDataHours() {
+function ValDataHours(): void {
   hour.value = hour.value.replace(new RegExp(/[a-z]|[A-Z]|2[5-9]|[3-9]\d|[^\w\u4E00-\u9FA5]/g), (r) => r.length > 1 ? r.substring(0, 1) : "");
 }
 
-function ValidateMinutes() {
+function ValidateMinutes(): void {
   minute.value = minute.value.replace(/[a-z]|[A-Z]|[6-9]\d|[^\w\u4E00-\u9FA5]/g, (r) => r.length > 1 ? r.substring(0, 1) : "");
 }
 
-function ValidateSeconds() {
+function ValidateSeconds(): void {
   second.value = second.value.replace(/[a-z]|[A-Z]|[6-9]\d|[^\w\u4E00-\u9FA5]/g, (r) => r.length > 1 ? r.substring(0, 1) : "");
+}
+
+function WorldTimeValue(): void {
+  let currentTime = moment().format();
+  let GMT_current_time = moment(currentTime).tz(WorldTime.value).format();
+  CurrentTimeZone.value = GMT_current_time;
 }
 </script>
 
