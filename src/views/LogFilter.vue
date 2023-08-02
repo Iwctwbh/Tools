@@ -387,7 +387,7 @@
 
 <script lang='ts' setup>
 // Import
-import { computed, ref, watch } from "vue";
+import {computed, ref, watch} from "vue";
 import moment from "moment";
 import _ from "lodash";
 import MdEditor from "md-editor-v3";
@@ -744,7 +744,7 @@ const btnResultStillShowClick = (): void => {
         markdownOut.value = arrayTempResult.join("\n");
         break;
       case "Table":
-        arrayTempResult.forEach(f => tableData.value.push({ data: f }));
+        arrayTempResult.forEach(f => tableData.value.push({data: f}));
         break;
       case "Textarea":
         textareaOut.value = arrayTempResult.join("\n");
@@ -816,11 +816,11 @@ const logFilterWithRegex = (): void => {
       isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
         if (reader.value === "Markdown" || reader.value === "Table") {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => !(f.match(regexInverseString) || []).length)
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => !(f.replaceAll('\r', '').replaceAll('\n', '').match(regexInverseString) || []).length)
               .map(s => s.replaceAll(regexString, (value) => `<label class="highlight">${value}</label>`)
                   .replaceAll("  ", "&nbsp;&nbsp;"));
         } else {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.match(regexInverseString) || []).length);
+          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.replaceAll('\r', '').replaceAll('\n', '').match(regexInverseString) || []).length);
         }
       } else {
         if (reader.value === "Markdown" || reader.value === "Table") {
@@ -840,7 +840,7 @@ const logFilterWithRegex = (): void => {
             markdownOut.value = arrayTempResult.join("\n");
             break;
           case "Table":
-            arrayTempResult.forEach(f => tableData.value.push({ data: f }));
+            arrayTempResult.forEach(f => tableData.value.push({data: f}));
             break;
           case "Textarea":
             textareaOut.value = arrayTempResult.join("\n");
@@ -860,7 +860,7 @@ const logFilterWithRegex = (): void => {
           markdownOut.value = arrayTempResult.join("\n");
           break;
         case "Table":
-          arrayTempResult.forEach(f => tableData.value.push({ data: f }));
+          arrayTempResult.forEach(f => tableData.value.push({data: f}));
           break;
         case "Textarea":
           textareaOut.value = arrayTempResult.join("\n");
