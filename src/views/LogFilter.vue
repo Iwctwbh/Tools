@@ -6,11 +6,11 @@
     <el-col :lg="9">
       <div style="display: flex; justify-content: space-between;">
         <el-checkbox
-            v-model="isAutoBreakLineForTextareaIn"
-            border
-            class="tools"
-            style="margin-bottom: 8px;"
-            title="自动换行"
+          v-model="isAutoBreakLineForTextareaIn"
+          border
+          class="tools"
+          style="margin-bottom: 8px;"
+          title="自动换行"
         >
           <strong style="font-size: 20px;">
             自动换行
@@ -20,7 +20,7 @@
           <el-button type="primary">
             例子 Sample
             <el-icon class="el-icon--right">
-              <arrow-down/>
+              <arrow-down />
             </el-icon>
           </el-button>
           <template #dropdown>
@@ -45,30 +45,32 @@
       <!--        <el-button size="small" type="primary">点击上传</el-button>-->
       <!--        <div slot="tip" class="el-upload__tip">只能上传txt文件</div>-->
       <!--      </el-upload>-->
-      <div style="position: relative; display: flex; justify-content: center;;">
+      <div style="position: relative; display: flex; justify-content: center;">
         <el-button
-            v-if="isFileTooBig"
-            :loading="isFileLoading"
-            style="position: absolute; z-index: 2; top: 70%;"
-            @click="btnFileStillShowClick"
+          v-if="isFileTooBig"
+          :loading="isFileLoading"
+          style="position: absolute; z-index: 2; top: 70%;"
+          @click="btnFileStillShowClick"
         >
           仍要显示 Still Show
         </el-button>
         <el-upload
-            id="upload"
-            :auto-upload="false"
-            :class="isPointerEventsNone ? 'pointer-events-none' : ''"
-            :file-list="fileList"
-            :on-change="uploadChange"
-            accept=".txt, .log"
-            action="none"
-            drag
-            multiple
-            style="position: absolute; opacity: 0.3; z-index: 1; height: 100%; width: 100%;"
-            @mouseenter="uploadMouseEnter"
+          id="upload"
+          :auto-upload="false"
+          :show-file-list="false"
+          :disabled="false"
+          :class="isPointerEventsNone ? 'pointer-events-none' : ''"
+          v-model:file-list="fileList"
+          :on-change="uploadChange"
+          accept=".txt, .log"
+          action="none"
+          drag
+          multiple
+          style="position: absolute; opacity: 0.3; z-index: 1; height: 100%; width: 100%;"
+          @mouseenter="uploadMouseEnter"
         >
           <el-icon class="el-icon--upload">
-            <upload-filled/>
+            <upload-filled />
           </el-icon>
           <div class="el-upload__text">
             {{
@@ -78,58 +80,58 @@
         </el-upload>
 
         <el-input
-            id="textareaIn"
-            v-model="textareaIn"
-            :autosize="{ minRows: 15, maxRows: 30 }"
-            :class="!isAutoBreakLineForTextareaIn ? 'noWrap' : ''"
-            placeholder="Please input text"
-            type="textarea"
-            @mouseleave="textareaMouseLeave"
+          id="textareaIn"
+          v-model="textareaIn"
+          :autosize="{ minRows: 15, maxRows: 30 }"
+          :class="!isAutoBreakLineForTextareaIn ? 'noWrap' : ''"
+          placeholder="Please input text"
+          type="textarea"
+          @mouseleave="textareaMouseLeave"
         />
       </div>
     </el-col>
     <el-col :lg="5" class="paddingTop40px" style="margin: 0 auto;">
       <div style="padding-bottom: 10px; width: 100%; display: inline-flex;">
         <el-time-picker
-            v-if="isOneDay"
-            v-model="timepicker"
-            :disabled-hours="disabledHours"
-            :disabled-minutes="disabledMinutes"
-            :disabled-seconds="disabledSeconds"
-            end-placeholder="End time"
-            is-range
-            placeholder="Arbitrary time"
-            range-separator="To"
-            start-placeholder="Start time"
+          v-if="isOneDay"
+          v-model="timepicker"
+          :disabled-hours="disabledHours"
+          :disabled-minutes="disabledMinutes"
+          :disabled-seconds="disabledSeconds"
+          end-placeholder="End time"
+          is-range
+          placeholder="Arbitrary time"
+          range-separator="To"
+          start-placeholder="Start time"
         />
         <el-date-picker
-            v-if="!isOneDay"
-            v-model="datepicker"
-            :default-time="defaultTime"
-            :disabled-date="disabledDates"
-            :disabled-hours="disabledHours"
-            :disabled-minutes="disabledMinutes"
-            :disabled-seconds="disabledSeconds"
-            end-placeholder="End Date"
-            start-placeholder="Start Date"
-            type="datetimerange"
-            @calendar-change="calendarChange"
+          v-if="!isOneDay"
+          v-model="datepicker"
+          :default-time="defaultTime"
+          :disabled-date="disabledDates"
+          :disabled-hours="disabledHours"
+          :disabled-minutes="disabledMinutes"
+          :disabled-seconds="disabledSeconds"
+          end-placeholder="End Date"
+          start-placeholder="Start Date"
+          type="datetimerange"
+          @calendar-change="calendarChange"
         />
       </div>
       <el-input
-          v-model="textRegex"
-          placeholder="Please input regex"
-          style="padding-bottom: 10px;"
-          type="text"
-          @keyup="logFilterForRegex"
+        v-model="textRegex"
+        placeholder="Please input regex"
+        style="padding-bottom: 10px;"
+        type="text"
+        @keyup="logFilterForRegex"
       />
       <div style="display: flex; justify-content: space-between;">
         <div style="display: flex; justify-content: space-between; width: 290px;">
           <el-checkbox
-              v-model="isCaseMatch"
-              border
-              class="tools"
-              title="区分大小写"
+            v-model="isCaseMatch"
+            border
+            class="tools"
+            title="区分大小写"
           >
             <strong style="font-size: 16px">
               Aa
@@ -137,10 +139,10 @@
           </el-checkbox>
 
           <el-checkbox
-              v-model="isRegexMatch"
-              border
-              class="tools"
-              title="正则表达式"
+            v-model="isRegexMatch"
+            border
+            class="tools"
+            title="正则表达式"
           >
             <strong style="font-size: 20px;">
               .*
@@ -149,11 +151,11 @@
 
           <div id="divFuzzySearch">
             <el-checkbox
-                id="isFuzzySearchAnd"
-                v-model="isFuzzySearchAnd"
-                border
-                class="tools"
-                title="模糊搜索 与"
+              id="isFuzzySearchAnd"
+              v-model="isFuzzySearchAnd"
+              border
+              class="tools"
+              title="模糊搜索 与"
             >
               <strong style="font-size: 20px;">
                 &
@@ -161,11 +163,11 @@
             </el-checkbox>
 
             <el-checkbox
-                id="isFuzzySearchOr"
-                v-model="isFuzzySearchOr"
-                border
-                class="tools"
-                title="模糊搜索 或"
+              id="isFuzzySearchOr"
+              v-model="isFuzzySearchOr"
+              border
+              class="tools"
+              title="模糊搜索 或"
             >
               <strong style="font-size: 20px;">
                 |
@@ -174,23 +176,23 @@
           </div>
 
           <el-checkbox
-              v-model="isRealtime"
-              border
-              class="tools"
-              style="margin-right: 0"
-              title="实时过滤"
+            v-model="isRealtime"
+            border
+            class="tools"
+            style="margin-right: 0"
+            title="实时过滤"
           >
             <strong>
               实时
             </strong>
             <el-tooltip
-                class="box-item"
-                content="性能堪忧"
-                effect="dark"
-                placement="bottom"
+              class="box-item"
+              content="性能堪忧"
+              effect="dark"
+              placement="bottom"
             >
               <el-icon>
-                <QuestionFilled/>
+                <QuestionFilled />
               </el-icon>
             </el-tooltip>
           </el-checkbox>
@@ -198,23 +200,40 @@
         <div style="flex: 1;"></div>
 
         <el-button
-            :disabled="isRealtime"
-            :loading="isFilterLoading"
-            type="primary"
-            @click="logFilterForBtn"
+          :disabled="isRealtime"
+          :loading="isFilterLoading"
+          type="primary"
+          @click="logFilterForBtn"
         >
           过滤
         </el-button>
       </div>
+      <el-upload
+        v-model:file-list="fileList"
+        class="upload-demo"
+        multiple
+        :on-preview="uploadPreview"
+        :on-change="uploadChange"
+        :auto-upload="false"
+        :disabled="false"
+        accept=".txt, .log"
+      >
+        <el-button type="primary">Click to upload</el-button>
+        <template #tip>
+          <div class="el-upload__tip">
+            <!--              jpg/png files with a size less than 500KB.-->
+          </div>
+        </template>
+      </el-upload>
     </el-col>
     <el-col :lg="9" style="display: flex; align-items: center; flex-direction: column; position: relative;">
       <el-row style="align-items: flex-start; width: 100%;">
         <el-col :xl="12">
           <el-radio-group
-              v-model="reader"
-              class="ml-4"
-              style="padding-right: 10px; flex-wrap: nowrap;"
-              @change="changeReader"
+            v-model="reader"
+            class="ml-4"
+            style="padding-right: 10px; flex-wrap: nowrap;"
+            @change="changeReader"
           >
             <el-radio label="Table" size="large">Table</el-radio>
             <el-radio label="Textarea" size="large">Textarea</el-radio>
@@ -224,17 +243,17 @@
         <el-col :xl="12" style="margin-bottom: 8px;">
           <div v-if="reader !== 'Textarea'" style="white-space: nowrap;">
             <span class="demonstration">高亮字体颜色</span>
-            <el-color-picker v-model="colorPickerFont"/>
+            <el-color-picker v-model="colorPickerFont" />
             &nbsp;
             <span class="demonstration">高亮字体背景颜色</span>
-            <el-color-picker v-model="colorPickerFontBackground"/>
+            <el-color-picker v-model="colorPickerFontBackground" />
           </div>
           <el-checkbox
-              v-if="reader === 'Textarea'"
-              v-model="isAutoBreakLineForTextareaOut"
-              border
-              class="tools"
-              title="自动换行"
+            v-if="reader === 'Textarea'"
+            v-model="isAutoBreakLineForTextareaOut"
+            border
+            class="tools"
+            title="自动换行"
           >
             <strong style="font-size: 20px;">
               自动换行
@@ -243,48 +262,48 @@
         </el-col>
       </el-row>
       <label
-          v-if="isResultTooBig"
-          style="position: absolute; z-index: 2; top: 40%;"
+        v-if="isResultTooBig"
+        style="position: absolute; z-index: 2; top: 40%;"
       >
         结果过大不予显示
       </label>
       <el-button
-          v-if="isResultTooBig"
-          :loading="isResultLoading"
-          style="position: absolute; z-index: 2; top: 50%;"
-          @click="btnResultStillShowClick"
+        v-if="isResultTooBig"
+        :loading="isResultLoading"
+        style="position: absolute; z-index: 2; top: 50%;"
+        @click="btnResultStillShowClick"
       >
         仍要显示 Still Show
       </el-button>
       <el-table
-          v-if="reader === 'Table'"
-          id="tableOut"
-          :data="tableData"
-          :show-header="false"
-          style="max-height: 625px; min-height: 325px;"
+        v-if="reader === 'Table'"
+        id="tableOut"
+        :data="tableData"
+        :show-header="false"
+        style="max-height: 625px; min-height: 325px;"
       >
         <el-table-column
-            v-slot="scope"
-            label="Data"
-            prop="data"
+          v-slot="scope"
+          label="Data"
+          prop="data"
         >
           <div v-html="scope.row.data"></div>
         </el-table-column>
       </el-table>
       <el-input
-          v-if="reader === 'Textarea'"
-          id="textareaOut"
-          v-model="textareaOut"
-          :autosize="{ minRows: 15 }"
-          :class="!isAutoBreakLineForTextareaOut ? 'noWrap' : ''"
-          readonly
-          style="flex: 1;"
-          type="textarea"
+        v-if="reader === 'Textarea'"
+        id="textareaOut"
+        v-model="textareaOut"
+        :autosize="{ minRows: 15 }"
+        :class="!isAutoBreakLineForTextareaOut ? 'noWrap' : ''"
+        readonly
+        style="flex: 1;"
+        type="textarea"
       />
       <md-editor
-          v-if="reader === 'Markdown'"
-          v-model="markdownOut"
-          style="flex: 1; min-height: 325px;"
+        v-if="reader === 'Markdown'"
+        v-model="markdownOut"
+        style="flex: 1; min-height: 325px;"
       ></md-editor>
       <p v-if="ifTimeSpend" style="width: 100%;">
         用时：{{ timeSpend }}
@@ -391,6 +410,9 @@ import {computed, ref, watch} from "vue";
 import moment from "moment";
 import _ from "lodash";
 import MdEditor from "md-editor-v3";
+import type {UploadFile, UploadFiles, UploadProps, UploadUserFile} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {DebouncedFunc, forEach} from "lodash-es";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
@@ -416,11 +438,11 @@ const isFuzzySearchOr = ref<boolean>(false);
 const isAutoBreakLineForTextareaIn = ref<boolean>(true);
 const isAutoBreakLineForTextareaOut = ref<boolean>(true);
 const isPointerEventsNone = ref<boolean>(false);
-const fileList = ref<any[]>([]);
 const isFileTooBig = ref<boolean>(false);
 const isFileLoading = ref<boolean>(false);
 const isResultTooBig = ref<boolean>(false);
 const isResultLoading = ref<boolean>(false);
+const fileList = ref<UploadUserFile[]>([]);
 
 const ifTimeSpend = computed<boolean>(() => {
   return timeSpend.value !== "";
@@ -484,29 +506,34 @@ watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearchAnd, isFuz
   let tempText = textRegex.value;
   let tempInverseText = "^(?!.*(" + tempText + "))";
   if (!isRegexMatch.value) {
-    tempText = tempText.replaceAll("\\", "\\\\") // 转义
-        .replaceAll(".", "\\.")
-        .replaceAll("*", "\\*")
-        .replaceAll("+", "\\+")
-        .replaceAll("?", "\\?")
-        .replaceAll("$", "\\$")
-        .replaceAll("^", "\\^")
-        .replaceAll("[", "\\[")
-        .replaceAll("]", "\\]")
-        .replaceAll("(", "\\(")
-        .replaceAll(")", "\\)")
-        .replaceAll("{", "\\{")
-        .replaceAll("}", "\\}")
-        .replaceAll("|", "\\|");
+    // tempText = tempText.replaceAll("\\", "\\\\") // 转义
+    //   .replaceAll(".", "\\.")
+    //   .replaceAll("*", "\\*")
+    //   .replaceAll("+", "\\+")
+    //   .replaceAll("?", "\\?")
+    //   .replaceAll("$", "\\$")
+    //   .replaceAll("^", "\\^")
+    //   .replaceAll("[", "\\[")
+    //   .replaceAll("]", "\\]")
+    //   .replaceAll("(", "\\(")
+    //   .replaceAll(")", "\\)")
+    //   .replaceAll("{", "\\{")
+    //   .replaceAll("}", "\\}")
+    //   .replaceAll("|", "\\|");
+    tempText = _.escapeRegExp(tempText);
     tempInverseText = "^(?!.*(" + tempText + "))";
     if (isFuzzySearchOr.value) {
-      // ^(?!.*((abc)|(def))))
+      // 使用中： ^(?!.*((abc)|(def)))
+      // 也许能有所优化： ^(?!.*(?:abc|def))
       tempInverseText = "^(?!.*(" + tempText.trim().split(" ").filter(f => f !== "").map(m => "(" + m + ")").join("|") + "))";
-      tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
+      // (abc|def)
+      tempText = "(" + tempText.split(" ").join("|") + ")";
     } else if (isFuzzySearchAnd.value) {
-      // ^(?!.*((abc)))|^(?!.*((def)))
+      // 使用中： ^(?!.*((abc)))|^(?!.*((def)))
+      // 也许能优化： ^(?!.*(abc|def))
       tempInverseText = tempText.trim().split(" ").filter(f => f !== "").map(m => "^(?!.*((" + m + ")))").join("|");
-      tempText = tempText.split(" ").map(m => "(" + m + ")?").join("");
+      // (abc|def)
+      tempText = "(" + tempText.split(" ").join("|") + ")";
     }
   }
   regexString = new RegExp(tempText, isCaseMatch.value ? "g" : "gi");
@@ -558,112 +585,112 @@ const handleCommand = (command: string | number | object) => {
   switch (command) {
     case "0":
       textareaIn.value =
-          [...Array(8)].map((itemHour, indexHour) =>
-              [...Array(60)].map((itemMinute, indexMinute) =>
-                  (indexHour + 9).toString()
-                      .padStart(2, "0")
-                      .concat(":")
-                      .concat(indexMinute.toString()
-                          .padStart(2, "0"))
-                      .concat(":")
-                      .concat(Math.floor(Math.random() * 60).toString()
-                          .padStart(2, "0"))
-                      .concat(".")
-                      .concat(Math.floor(Math.random() * 1000)
-                          .toString()
-                          .padStart(3, "0"))
-                      .concat(" ")
-                      .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
-                      .concat(" [][] ")
-                      .concat(Math.random()
-                          .toString(36)
-                          .substring(2))
-              )
-          ).flat(Infinity).join("\n");
+        [...Array(8)].map((itemHour, indexHour) =>
+          [...Array(60)].map((itemMinute, indexMinute) =>
+            (indexHour + 9).toString()
+              .padStart(2, "0")
+              .concat(":")
+              .concat(indexMinute.toString()
+                .padStart(2, "0"))
+              .concat(":")
+              .concat(Math.floor(Math.random() * 60).toString()
+                .padStart(2, "0"))
+              .concat(".")
+              .concat(Math.floor(Math.random() * 1000)
+                .toString()
+                .padStart(3, "0"))
+              .concat(" ")
+              .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+              .concat(" [][] ")
+              .concat(Math.random()
+                .toString(36)
+                .substring(2))
+          )
+        ).flat(Infinity).join("\n");
       break;
     case "1":
       textareaIn.value =
-          [...Array(24)].map((itemHour, indexHour) =>
-              [...Array(60)].map((itemMinute, indexMinute) =>
-                  (_.first(ARRAY_DATE) ?? "2023/01/01").concat(" ")
-                      .concat(indexHour.toString()
-                          .padStart(2, "0"))
-                      .concat(":")
-                      .concat(indexMinute.toString()
-                          .padStart(2, "0"))
-                      .concat(":")
-                      .concat(Math.floor(Math.random() * 60).toString()
-                          .padStart(2, "0"))
-                      .concat(".")
-                      .concat(Math.floor(Math.random() * 1000)
-                          .toString()
-                          .padStart(3, "0"))
-                      .concat(" ")
-                      .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
-                      .concat(" [][] ")
-                      .concat(Math.random()
-                          .toString(36)
-                          .substring(2))
-              )
-          ).flat(Infinity).join("\n");
+        [...Array(24)].map((itemHour, indexHour) =>
+          [...Array(60)].map((itemMinute, indexMinute) =>
+            (_.first(ARRAY_DATE) ?? "2023/01/01").concat(" ")
+              .concat(indexHour.toString()
+                .padStart(2, "0"))
+              .concat(":")
+              .concat(indexMinute.toString()
+                .padStart(2, "0"))
+              .concat(":")
+              .concat(Math.floor(Math.random() * 60).toString()
+                .padStart(2, "0"))
+              .concat(".")
+              .concat(Math.floor(Math.random() * 1000)
+                .toString()
+                .padStart(3, "0"))
+              .concat(" ")
+              .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+              .concat(" [][] ")
+              .concat(Math.random()
+                .toString(36)
+                .substring(2))
+          )
+        ).flat(Infinity).join("\n");
       break;
     case "2":
       textareaIn.value =
-          ARRAY_DATE.map((itemDate, indexDate) =>
-              [...Array(24)].map((itemHour, indexHour) =>
-                  [...Array(60)].map((itemMinute, indexMinute) =>
-                      moment(itemDate).format("yyyy-MM-DD")
-                          .concat(" ")
-                          .concat(indexHour.toString()
-                              .padStart(2, "0"))
-                          .concat(":")
-                          .concat(indexMinute.toString()
-                              .padStart(2, "0"))
-                          .concat(":")
-                          .concat(Math.floor(Math.random() * 60).toString()
-                              .padStart(2, "0"))
-                          .concat(".")
-                          .concat(Math.floor(Math.random() * 1000)
-                              .toString()
-                              .padStart(3, "0"))
-                          .concat(" ")
-                          .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
-                          .concat(" [][] ")
-                          .concat(Math.random()
-                              .toString(36)
-                              .substring(2))
-                  )
-              )
-          ).flat(Infinity).join("\n");
+        ARRAY_DATE.map((itemDate, indexDate) =>
+          [...Array(24)].map((itemHour, indexHour) =>
+            [...Array(60)].map((itemMinute, indexMinute) =>
+              moment(itemDate).format("yyyy-MM-DD")
+                .concat(" ")
+                .concat(indexHour.toString()
+                  .padStart(2, "0"))
+                .concat(":")
+                .concat(indexMinute.toString()
+                  .padStart(2, "0"))
+                .concat(":")
+                .concat(Math.floor(Math.random() * 60).toString()
+                  .padStart(2, "0"))
+                .concat(".")
+                .concat(Math.floor(Math.random() * 1000)
+                  .toString()
+                  .padStart(3, "0"))
+                .concat(" ")
+                .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+                .concat(" [][] ")
+                .concat(Math.random()
+                  .toString(36)
+                  .substring(2))
+            )
+          )
+        ).flat(Infinity).join("\n");
       break;
     case "3":
       textareaIn.value =
-          ARRAY_DATE.map((itemDate, indexDate) =>
-              [...Array(24)].map((itemHour, indexHour) =>
-                  [...Array(60)].map((itemMinute, indexMinute) =>
-                      moment(itemDate).format("MM/DD/YYYY")
-                          .concat(" ")
-                          .concat(indexHour.toString()
-                              .padStart(2, "0"))
-                          .concat(":")
-                          .concat(indexMinute.toString()
-                              .padStart(2, "0"))
-                          .concat(":")
-                          .concat(Math.floor(Math.random() * 60).toString()
-                              .padStart(2, "0"))
-                          .concat(".")
-                          .concat(Math.floor(Math.random() * 1000)
-                              .toString()
-                              .padStart(3, "0"))
-                          .concat(" ")
-                          .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
-                          .concat(" [][] ")
-                          .concat(Math.random()
-                              .toString(36)
-                              .substring(2))
-                  )
-              )
-          ).flat(Infinity).join("\n");
+        ARRAY_DATE.map((itemDate, indexDate) =>
+          [...Array(24)].map((itemHour, indexHour) =>
+            [...Array(60)].map((itemMinute, indexMinute) =>
+              moment(itemDate).format("MM/DD/YYYY")
+                .concat(" ")
+                .concat(indexHour.toString()
+                  .padStart(2, "0"))
+                .concat(":")
+                .concat(indexMinute.toString()
+                  .padStart(2, "0"))
+                .concat(":")
+                .concat(Math.floor(Math.random() * 60).toString()
+                  .padStart(2, "0"))
+                .concat(".")
+                .concat(Math.floor(Math.random() * 1000)
+                  .toString()
+                  .padStart(3, "0"))
+                .concat(" ")
+                .concat(LOGLEVEL[Math.floor(Math.random() * 5)].padEnd(5, " "))
+                .concat(" [][] ")
+                .concat(Math.random()
+                  .toString(36)
+                  .substring(2))
+            )
+          )
+        ).flat(Infinity).join("\n");
       break;
   }
 }; // 下拉框点击事件
@@ -679,41 +706,6 @@ const textareaMouseLeave = (e: any): void => {
   isPointerEventsNone.value = false;
   isUploadChange = false;
 }; // textareaMouseLeave
-
-// uploadChange
-const uploadChange = (res: Record<string, any>, file: any): void => {
-  if (res) {
-    textareaIn.value = "";
-    let fileReader = new FileReader();
-    fileReader.readAsText(res.raw);
-    fileReader.onload = (e) => {
-      isResultTooBig.value = false;
-      if (isUploadChange) {
-        arrayFileIn = arrayFileIn.concat((fileReader.result as string).split("\n").filter(f => f !== ""));
-      } else {
-        arrayFileIn = arrayFileIn = (fileReader.result as string).split("\n").filter(f => f !== "");
-      }
-      if (arrayFileIn.length > MAX_LENGTH) {
-        isFileTooBig.value = true;
-        textareaIn.value = "";
-        mappingData();
-        isTextareaInOrTimeChange = true;
-        arrayTextareaInFilterByTime = [];
-        if (isRealtime.value) {
-          logFilterForBtn.value();
-        }
-      } else {
-        isFileTooBig.value = false;
-        textareaIn.value = arrayFileIn.join("\n");
-      }
-
-      setTimeout(() => {
-        isUploadChange = false;
-      }, 1000);
-    };
-  }
-  fileList.value = [];
-}; // uploadChange
 
 // btnFileStillShowClick
 const btnFileStillShowClick = (): void => {
@@ -815,17 +807,16 @@ const logFilterWithRegex = (): void => {
       isRegexChange = false;
       isTextareaInOrTimeChange = false;
       if (textRegex.value !== "") {
+        arrayTempResult = arrayTextareaInFilterByTime.filter(f => !(f.replaceAll("\r", "").replaceAll("\n", "")
+          .match(regexInverseString) || []).length);
         if (reader.value === "Markdown" || reader.value === "Table") {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => !(f.replaceAll('\r', '').replaceAll('\n', '').match(regexInverseString) || []).length)
-              .map(s => s.replaceAll(regexString, (value) => `<label class="highlight">${value}</label>`)
-                  .replaceAll("  ", "&nbsp;&nbsp;"));
-        } else {
-          arrayTempResult = arrayTextareaInFilterByTime.filter(f => (f.replaceAll('\r', '').replaceAll('\n', '').match(regexInverseString) || []).length);
+          arrayTempResult = arrayTempResult.map(s => s.replaceAll(regexString, (value) => `<label class="highlight">${value}</label>`)
+            .replaceAll("  ", "&nbsp;&nbsp;"));
         }
       } else {
         if (reader.value === "Markdown" || reader.value === "Table") {
           arrayTempResult = arrayTextareaInFilterByTime
-              .map(s => s.replaceAll("  ", "&nbsp;&nbsp;"));
+            .map(s => s.replaceAll("  ", "&nbsp;&nbsp;"));
         } else {
           arrayTempResult = arrayTextareaInFilterByTime;
         }
@@ -922,10 +913,11 @@ const binarySearchMin = (array: string[], x: string): number => {
   return left;
 }; // 二分查找arrayTextareaIn中不小x的最小值
 
+// 映射数据
 const mappingData = (): void => {
   if (textareaIn.value !== "") {
     arrayTextareaIn = textareaIn.value
-        .split("\n").filter(f => f !== "");
+      .split("\n").filter(f => f !== "");
     arrayFileIn = [];
   } else if (arrayFileIn.length > 0) {
     arrayTextareaIn = arrayFileIn;
@@ -978,26 +970,26 @@ const recognitionTime = (s: string): string => {
   let indexStringMoment: number = 0;
   let indexStringMomentOnlyTime: number = 0;
   s.split("")
-      .forEach((v, i) => {
-        s.split("")
-            .splice(i)
-            .reduce((previousValue, currentValue, currentIndex, array) => {
-              let value = previousValue + currentValue;
-              if (value.length > 25) {
-                array.splice(1);
-              } else if (value.length > 7) {
-                if (value.length > stringMoment.length && moment(value).isValid() && REGEX_TIME.test(value)) {
-                  stringMoment = value;
-                  indexStringMoment = i;
-                }
-                if (value.length > stringMomentOnlyTime.length && moment(YEAR_START.concat(value)).isValid() && REGEX_TIME.test(value)) {
-                  stringMomentOnlyTime = value;
-                  indexStringMomentOnlyTime = i;
-                }
-              }
-              return value;
-            });
-      });
+    .forEach((v, i) => {
+      s.split("")
+        .splice(i)
+        .reduce((previousValue, currentValue, currentIndex, array) => {
+          let value = previousValue + currentValue;
+          if (value.length > 25) {
+            array.splice(1);
+          } else if (value.length > 7) {
+            if (value.length > stringMoment.length && moment(value).isValid() && REGEX_TIME.test(value)) {
+              stringMoment = value;
+              indexStringMoment = i;
+            }
+            if (value.length > stringMomentOnlyTime.length && moment(YEAR_START.concat(value)).isValid() && REGEX_TIME.test(value)) {
+              stringMomentOnlyTime = value;
+              indexStringMomentOnlyTime = i;
+            }
+          }
+          return value;
+        });
+    });
   if (stringMoment.length >= stringMomentOnlyTime.length) {
     recognitionTimeStart = indexStringMoment;
     recognitionTimeEnd = indexStringMoment + stringMoment.length;
@@ -1008,8 +1000,8 @@ const recognitionTime = (s: string): string => {
     isOnlyTime = true;
   }
   return stringMoment.length >= stringMomentOnlyTime.length
-      ? stringMoment
-      : YEAR_START.concat(stringMomentOnlyTime);
+    ? stringMoment
+    : YEAR_START.concat(stringMomentOnlyTime);
 }; // 获取时间
 
 // 校对时间
@@ -1042,14 +1034,14 @@ const calendarChange = ref((array: [Date, Date]): void => {
 // 禁用日期
 const disabledDates = ref((date: Date): boolean => {
   return moment(date).isBefore(moment(dateStart), "date")
-      || moment(date).isAfter(moment(dateEnd), "date");
+    || moment(date).isAfter(moment(dateEnd), "date");
 }); // 禁用日期
 
 // 禁用小时
-const disabledHours = ref((pos_datepicker: string): number[] => {
+const disabledHours = ref((posDatepicker: string): number[] => {
   const momentDateStart = moment(dateStart).startOf("date");
   const momentDateEnd = moment(dateEnd).startOf("date");
-  if (pos_datepicker === "start") {
+  if (posDatepicker === "start") {
     let momentDateStartCurrent = moment(_.first(arrayDatepicker)).startOf("date");
     let arrayStartDisabledHours: number[] = [];
     if (momentDateStartCurrent.isSame(momentDateStart)) {
@@ -1076,15 +1068,15 @@ const disabledHours = ref((pos_datepicker: string): number[] => {
 const disabledMinutes = ref((hour: number): number[] => {
   let arrayDisabledMinutes: number[] = [];
   if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
-      && moment(_.first(arrayDatepicker))
-          .startOf("date")
-          .isSame(moment(dateStart).startOf("date"))) {
+    && moment(_.first(arrayDatepicker))
+      .startOf("date")
+      .isSame(moment(dateStart).startOf("date"))) {
     arrayDisabledMinutes = arrayDisabledMinutes.concat(arrayDisabledMinutesStart);
   }
   if (_.last(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
-      && moment(_.last(arrayDatepicker))
-          .startOf("date")
-          .isSame(moment(dateEnd).startOf("date"))) {
+    && moment(_.last(arrayDatepicker))
+      .startOf("date")
+      .isSame(moment(dateEnd).startOf("date"))) {
     arrayDisabledMinutes = arrayDisabledMinutes.concat(arrayDisabledMinutesEnd);
   }
   return arrayDisabledMinutes;
@@ -1094,17 +1086,17 @@ const disabledMinutes = ref((hour: number): number[] => {
 const disabledSeconds = ref((hour: number, minute: number): number[] => {
   let arrayDisabledSeconds: number[] = [];
   if (_.first(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
-      && _.first(_.difference(ARRAY_MINUTES, arrayDisabledMinutesStart)) === minute
-      && moment(_.first(arrayDatepicker))
-          .startOf("date")
-          .isSame(moment(dateStart).startOf("date"))) {
+    && _.first(_.difference(ARRAY_MINUTES, arrayDisabledMinutesStart)) === minute
+    && moment(_.first(arrayDatepicker))
+      .startOf("date")
+      .isSame(moment(dateStart).startOf("date"))) {
     arrayDisabledSeconds = arrayDisabledSeconds.concat(arrayDisabledSecondsStart);
   }
   if (_.last(_.difference(ARRAY_HOURS, arrayDisabledHours)) === hour
-      && _.last(_.difference(ARRAY_SECONDS, arrayDisabledMinutesEnd)) === minute
-      && moment(_.last(arrayDatepicker))
-          .startOf("date")
-          .isSame(moment(dateEnd).startOf("date"))) {
+    && _.last(_.difference(ARRAY_SECONDS, arrayDisabledMinutesEnd)) === minute
+    && moment(_.last(arrayDatepicker))
+      .startOf("date")
+      .isSame(moment(dateEnd).startOf("date"))) {
     arrayDisabledSeconds = arrayDisabledSeconds.concat(arrayDisabledSecondsEnd);
   }
   return arrayDisabledSeconds;
@@ -1113,7 +1105,7 @@ const disabledSeconds = ref((hour: number, minute: number): number[] => {
 // 得到范围内的时间
 const makeRange = (start: number, end: number): number[] => {
   const result: number[] = [];
-  for (let i = start; i <= end; i++) {
+  for (let i = start; i <= end; ++i) {
     result.push(i);
   }
   return result;
@@ -1137,4 +1129,47 @@ const compareOnlyTime = (time1: any, time2: any): number => {
     return 0;
   }
 }; // 仅比较时间
+
+const uploadPreview: UploadProps["onPreview"] = (uploadFile) => {
+  console.log(uploadFile, 2333);
+};
+
+// 上传文件
+const uploadChange: UploadProps["onChange"] = (file, uploadFiles) => {
+  calculateUpload(uploadFiles);
+}; // 上传文件
+
+/*
+多文件上传，3种模式
+1. 文件名排序
+2. 文件第一行和最好一行排序
+3. 所有文件所有记录混合排序（就是你的分布式得到的log文件）
+*/
+
+// 根据排序同步获取文件内容
+const getFileText = async (uploadFiles: UploadFiles) => {
+  for (let i in uploadFiles) {
+    let f: UploadFile = uploadFiles[i];
+    await f.raw?.text().then((res) => {
+      arrayFileIn.push(...res.split("\n").filter(f => f !== ""));
+    });
+  }
+}; // 根据排序同步获取文件内容
+
+// 上传文件
+const calculateUpload: DebouncedFunc<any> = _.debounce((uploadFiles: UploadFiles): void => {
+  textareaIn.value = "";
+  isFileTooBig.value = true;
+  uploadFiles = _.sortBy(uploadFiles, (s) => s.name);
+  fileList.value = uploadFiles;
+  getFileText(uploadFiles).then(() => {
+    calculateUploadComplete();
+  });
+}, 1000); // 上传文件
+
+// 上传文件完成
+const calculateUploadComplete: DebouncedFunc<any> = _.debounce((): void => {
+  isTextareaInOrTimeChange = true;
+  mappingData();
+}, 1000); // 上传文件完成
 </script>
