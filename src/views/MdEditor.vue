@@ -23,7 +23,7 @@
 
 <script lang='ts' setup>
 // Import
-import MdEditor from "md-editor-v3";
+import {MdEditor} from "md-editor-v3";
 import { ref } from "vue";
 
 // Init

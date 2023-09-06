@@ -210,13 +210,15 @@
       </div>
       <el-upload
         v-model:file-list="fileList"
-        class="upload-demo"
+        class="upload"
         multiple
         :on-preview="uploadPreview"
         :on-change="uploadChange"
+        :on-remove="uploadRemove"
         :auto-upload="false"
         :disabled="false"
         accept=".txt, .log"
+        style="padding-top: 10px;"
       >
         <el-button type="primary">Click to upload</el-button>
         <template #tip>
@@ -305,12 +307,13 @@
         v-model="markdownOut"
         style="flex: 1; min-height: 325px;"
       ></md-editor>
-      <p v-if="ifTimeSpend" style="width: 100%;">
-        用时：{{ timeSpend }}
-      </p>
-      <p style="margin-top: 0;">&nbsp;</p>
     </el-col>
   </el-row>
+  <el-col :lg="9" :offset="15">
+    <p v-if="ifTimeSpend" style="width: 100%;">
+      用时：{{ timeSpend }}
+    </p>
+  </el-col>
 </template>
 
 <style>
@@ -350,7 +353,13 @@
 }
 
 #app #textareaOut {
-  height: 100% !important;
+  max-height: 625px;
+}
+
+@media only screen and (min-width: 1200px) {
+  #app #textareaOut {
+    height: 100% !important;
+  }
 }
 
 #app .noWrap textarea {
@@ -404,12 +413,27 @@
 }
 </style>
 
+<style scoped>
+.upload >>> .el-upload {
+  width: 100%;
+}
+
+.upload >>> .el-button {
+  width: 100%;
+}
+
+.upload >>> .el-upload-list {
+  overflow: auto;
+  max-height: 456px;
+}
+</style>
+
 <script lang='ts' setup>
 // Import
 import {computed, ref, watch} from "vue";
 import moment from "moment";
 import _ from "lodash";
-import MdEditor from "md-editor-v3";
+import {MdEditor} from "md-editor-v3";
 import type {UploadFile, UploadFiles, UploadProps, UploadUserFile} from "element-plus";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {DebouncedFunc, forEach} from "lodash-es";
@@ -1130,9 +1154,15 @@ const compareOnlyTime = (time1: any, time2: any): number => {
   }
 }; // 仅比较时间
 
+// 预览文件
 const uploadPreview: UploadProps["onPreview"] = (uploadFile) => {
   console.log(uploadFile, 2333);
-};
+}; // 预览文件
+
+// 移除文件
+const uploadRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
+  calculateUpload(uploadFiles);
+}; // 移除文件
 
 // 上传文件
 const uploadChange: UploadProps["onChange"] = (file, uploadFiles) => {
@@ -1159,6 +1189,7 @@ const getFileText = async (uploadFiles: UploadFiles) => {
 // 上传文件
 const calculateUpload: DebouncedFunc<any> = _.debounce((uploadFiles: UploadFiles): void => {
   textareaIn.value = "";
+  arrayFileIn = [];
   isFileTooBig.value = true;
   uploadFiles = _.sortBy(uploadFiles, (s) => s.name);
   fileList.value = uploadFiles;
