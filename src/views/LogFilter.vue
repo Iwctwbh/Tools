@@ -420,15 +420,15 @@
 </style>
 
 <style scoped>
-.upload >>> .el-upload {
+:deep(.upload .el-upload) {
   width: 100%;
 }
 
-.upload >>> .el-button {
+:deep(.upload .el-button) {
   width: 100%;
 }
 
-.upload >>> .el-upload-list {
+:deep(.upload .el-upload-list) {
   overflow: auto;
   max-height: 456px;
 }
