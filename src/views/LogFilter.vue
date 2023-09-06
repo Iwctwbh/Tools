@@ -82,6 +82,7 @@
         <el-input
           id="textareaIn"
           v-model="textareaIn"
+          v-model:oninput="textareaInChange"
           :autosize="{ minRows: 15, maxRows: 30 }"
           :class="!isAutoBreakLineForTextareaIn ? 'noWrap' : ''"
           placeholder="Please input text"
@@ -220,7 +221,12 @@
         accept=".txt, .log"
         style="padding-top: 10px;"
       >
-        <el-button type="primary">Click to upload</el-button>
+        <el-button
+          type="primary"
+          :loading="isUploadLoading"
+        >
+          Upload
+        </el-button>
         <template #tip>
           <div class="el-upload__tip">
             <!--              jpg/png files with a size less than 500KB.-->
@@ -464,6 +470,7 @@ const isAutoBreakLineForTextareaOut = ref<boolean>(true);
 const isPointerEventsNone = ref<boolean>(false);
 const isFileTooBig = ref<boolean>(false);
 const isFileLoading = ref<boolean>(false);
+const isUploadLoading = ref<boolean>(false);
 const isResultTooBig = ref<boolean>(false);
 const isResultLoading = ref<boolean>(false);
 const fileList = ref<UploadUserFile[]>([]);
@@ -512,18 +519,19 @@ let arrayTempResult: string[] = [];
 
 // Event
 
-// 监听输入框
-watch([textareaIn], (): void => {
+// 输入框改变
+const textareaInChange = (flag: boolean = false) => {
   isFileTooBig.value = false;
   isResultTooBig.value = false;
   arrayFileIn = [];
+  fileList.value = [];
   mappingData();
   isTextareaInOrTimeChange = true;
   arrayTextareaInFilterByTime = [];
   if (isRealtime.value) {
     logFilterForBtn.value();
   }
-}); // 监听输入框
+}; // 输入框改变
 
 // 监听选项
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearchAnd, isFuzzySearchOr], (): void => {
@@ -1161,11 +1169,13 @@ const uploadPreview: UploadProps["onPreview"] = (uploadFile) => {
 
 // 移除文件
 const uploadRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
+  isUploadLoading.value = true;
   calculateUpload(uploadFiles);
 }; // 移除文件
 
 // 上传文件
 const uploadChange: UploadProps["onChange"] = (file, uploadFiles) => {
+  isUploadLoading.value = true;
   calculateUpload(uploadFiles);
 }; // 上传文件
 
@@ -1190,17 +1200,29 @@ const getFileText = async (uploadFiles: UploadFiles) => {
 const calculateUpload: DebouncedFunc<any> = _.debounce((uploadFiles: UploadFiles): void => {
   textareaIn.value = "";
   arrayFileIn = [];
-  isFileTooBig.value = true;
-  uploadFiles = _.sortBy(uploadFiles, (s) => s.name);
-  fileList.value = uploadFiles;
-  getFileText(uploadFiles).then(() => {
-    calculateUploadComplete();
-  });
+  arrayTextareaIn = [];
+  if (uploadFiles.length === 0) {
+    isFileTooBig.value = false;
+    isUploadLoading.value = false;
+  } else {
+    uploadFiles = _.sortBy(uploadFiles, (s) => s.name);
+    fileList.value = uploadFiles;
+    getFileText(uploadFiles).then(() => {
+      if (arrayFileIn.length > MAX_LENGTH) {
+        isFileTooBig.value = true;
+      } else {
+        isFileTooBig.value = false;
+        textareaIn.value = arrayFileIn.join("\n");
+      }
+      calculateUploadComplete();
+    });
+  }
 }, 1000); // 上传文件
 
 // 上传文件完成
 const calculateUploadComplete: DebouncedFunc<any> = _.debounce((): void => {
   isTextareaInOrTimeChange = true;
   mappingData();
+  isUploadLoading.value = false;
 }, 1000); // 上传文件完成
 </script>
