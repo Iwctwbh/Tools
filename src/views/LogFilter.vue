@@ -82,7 +82,6 @@
         <el-input
           id="textareaIn"
           v-model="textareaIn"
-          v-model:oninput="textareaInChange"
           :autosize="{ minRows: 15, maxRows: 30 }"
           :class="!isAutoBreakLineForTextareaIn ? 'noWrap' : ''"
           placeholder="Please input text"
@@ -519,19 +518,21 @@ let arrayTempResult: string[] = [];
 
 // Event
 
-// 输入框改变
-const textareaInChange = (flag: boolean = false) => {
-  isFileTooBig.value = false;
-  isResultTooBig.value = false;
-  arrayFileIn = [];
-  fileList.value = [];
-  mappingData();
-  isTextareaInOrTimeChange = true;
-  arrayTextareaInFilterByTime = [];
-  if (isRealtime.value) {
-    logFilterForBtn.value();
+// 监听输入框
+watch([textareaIn], (): void => {
+  if (!isUploadLoading.value) {
+    isFileTooBig.value = false;
+    isResultTooBig.value = false;
+    arrayFileIn = [];
+    fileList.value = [];
+    mappingData();
+    isTextareaInOrTimeChange = true;
+    arrayTextareaInFilterByTime = [];
+    if (isRealtime.value) {
+      logFilterForBtn.value();
+    }
   }
-}; // 输入框改变
+}); // 监听输入框
 
 // 监听选项
 watch([isRealtime, textRegex, isCaseMatch, isRegexMatch, isFuzzySearchAnd, isFuzzySearchOr], (): void => {
