@@ -18,3 +18,6 @@
     </el-col>
   </el-row>
 </template>
+
+<script lang='ts' setup>
+</script>

@@ -37,7 +37,7 @@ let textRowNumberDom: HTMLElement | null = null;
 let textareaDom: HTMLElement | null = null;
 
 // Export
-// export interface iProps build会报错
+// interface iProps build会报错
 interface iProps {
   textareaId?: string;
   textRowNumberId?: string;
@@ -64,8 +64,8 @@ const textarea = ref<string>("");
 
 // 监听textarea的变化
 watch(textarea, (): void => {
-  let rowNumber: number = textarea.value.split('\n').length;
-  textRowNumber.value = [...Array(rowNumber)].map((item, index) => index + 1).join('\n');
+  let rowNumber: number = textarea.value.split("\n").length;
+  textRowNumber.value = [...Array(rowNumber)].map((item, index) => index + 1).join("\n");
 }); // 监听textarea的变化
 
 // Mounted
@@ -73,10 +73,10 @@ onMounted(() => {
   nextTick(() => {
     textareaDom = document.getElementById(textareaId.value);
     textRowNumberDom = document.getElementById(textRowNumberId.value);
-    textareaDom!.addEventListener('scroll', () => textRowNumberDom!.scrollTop = textareaDom!.scrollTop);
-    textRowNumberDom!.addEventListener('scroll', () => textareaDom!.scrollTop = textRowNumberDom!.scrollTop);
+    textareaDom!.addEventListener("scroll", () => textRowNumberDom!.scrollTop = textareaDom!.scrollTop);
+    textRowNumberDom!.addEventListener("scroll", () => textareaDom!.scrollTop = textRowNumberDom!.scrollTop);
   });
-})
+});
 
 // Expose
 defineExpose({textValue: textarea});
@@ -88,7 +88,8 @@ defineExpose({textValue: textarea});
   background-color: #ececec;
   color: #000000;
 }
-.right_textarea .el-textarea__inner{
+
+.right_textarea .el-textarea__inner {
   white-space: nowrap;
 }
 </style>

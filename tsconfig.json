@@ -25,6 +25,9 @@
     "src/**/*.tsx",
     "src/**/*.vue"
   ],
+  "ts-node": {
+    "esm": true
+  },
   "references": [
     {
       "path": "./tsconfig.node.json"

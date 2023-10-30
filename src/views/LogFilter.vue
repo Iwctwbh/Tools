@@ -65,7 +65,6 @@
           accept=".txt, .log"
           action="none"
           drag
-          multiple
           style="position: absolute; opacity: 0.3; z-index: 1; height: 100%; width: 100%;"
           @mouseenter="uploadMouseEnter"
         >
@@ -221,7 +220,6 @@
         style="padding-top: 10px;"
       >
         <el-button
-          type="primary"
           :loading="isUploadLoading"
         >
           Upload
@@ -441,7 +439,6 @@ import _ from "lodash";
 import {MdEditor} from "md-editor-v3";
 import type {UploadFile, UploadFiles, UploadProps, UploadUserFile} from "element-plus";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {DebouncedFunc, forEach} from "lodash-es";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
@@ -611,6 +608,9 @@ watch([isRegexMatch], (): void => {
 }); // 监听isRegexMatch
 
 // Function
+
+//统计重复项
+//_.chain(_.countBy(arrayFileIn.map(m=>m.substr(25,10)))).map(function(cnt, brand){return {brand: brand, count: cnt}}).sortBy('count').reverse().value()
 
 // 下拉框点击事件
 const handleCommand = (command: string | number | object) => {
@@ -1192,13 +1192,15 @@ const getFileText = async (uploadFiles: UploadFiles) => {
   for (let i in uploadFiles) {
     let f: UploadFile = uploadFiles[i];
     await f.raw?.text().then((res) => {
-      arrayFileIn.push(...res.split("\n").filter(f => f !== ""));
+      res.split("\n").filter(f => f !== "").forEach((v) => {
+        arrayFileIn.push(v);
+      });
     });
   }
 }; // 根据排序同步获取文件内容
 
 // 上传文件
-const calculateUpload: DebouncedFunc<any> = _.debounce((uploadFiles: UploadFiles): void => {
+const calculateUpload: _.DebouncedFunc<any> = _.debounce((uploadFiles: UploadFiles): void => {
   textareaIn.value = "";
   arrayFileIn = [];
   arrayTextareaIn = [];
@@ -1221,9 +1223,14 @@ const calculateUpload: DebouncedFunc<any> = _.debounce((uploadFiles: UploadFiles
 }, 1000); // 上传文件
 
 // 上传文件完成
-const calculateUploadComplete: DebouncedFunc<any> = _.debounce((): void => {
+const calculateUploadComplete: _.DebouncedFunc<any> = _.debounce((): void => {
   isTextareaInOrTimeChange = true;
   mappingData();
   isUploadLoading.value = false;
 }, 1000); // 上传文件完成
+
+// _.chain(_.countBy(arrayFileIn.map(m => arrayFileIn.map(m => m.substring(25, 10))).filter(f => f != undefined))).map(function (cnt, brand) {
+//   return {brand: brand, count: cnt};
+// }).sortBy("count").reverse().value();
 </script>
+
