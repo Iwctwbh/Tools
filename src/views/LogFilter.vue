@@ -319,94 +319,100 @@
   </el-col>
 </template>
 
-<style>
+<style lang="scss">
 @import "md-editor-v3/lib/style.css";
 
-#app .el-date-editor.el-input, #app .el-date-editor.el-input__wrapper {
-  width: auto;
-}
+#app {
+  .el-date-editor.el-input, .el-date-editor.el-input__wrapper {
+    width: auto;
+  }
 
-#app .md-editor-toolbar-wrapper, #app .md-editor-footer, #app .md-editor-input-wrapper {
-  display: none;
-}
+  .md-editor-toolbar-wrapper, .md-editor-footer, .md-editor-input-wrapper {
+    display: none;
+  }
 
-#app #textareaIn {
-  max-height: 625px;
-}
+  #textareaIn {
+    max-height: 625px;
+  }
 
-#app #md-editor-v3 {
-  max-height: 625px;
-}
+  #md-editor-v3 {
+    max-height: 625px;
+  }
 
-#app #md-editor-v3-preview {
-  padding: 5px 11px;
-}
+  #md-editor-v3-preview {
+    padding: 5px 11px;
+  }
 
-#app .tools {
-  margin: 0px;
-}
+  .tools {
+    margin: 0px;
 
-#app .tools .el-checkbox__inner {
-  display: none;
-}
+    .el-checkbox__inner {
+      display: none;
+    }
+  }
 
-#app .highlight {
-  color: v-bind(colorPickerFont);
-  background-color: v-bind(colorPickerFontBackground);
-}
+  .highlight {
+    color: v-bind(colorPickerFont);
+    background-color: v-bind(colorPickerFontBackground);
+  }
 
-#app #textareaOut {
-  max-height: 625px;
+  #textareaOut {
+    max-height: 625px;
+  }
+
+  .noWrap textarea {
+    white-space: pre;
+  }
+
+  #upload {
+    .el-upload.el-upload--text.is-drag {
+      height: 100%;
+    }
+
+    .el-upload-dragger {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  #upload.pointer-events-none {
+    pointer-events: none;
+  }
+
+  #tableOut table tbody tr td .cell {
+    white-space: pre-line;
+  }
+
+  #divFuzzySearch {
+    .tools {
+      padding: 0 10px;
+
+      .el-checkbox__label {
+        padding: 0;
+      }
+    }
+
+    .tools:first-child {
+      border-right: 0px;
+    }
+
+    .tools:last-child {
+      border-left: 0px;
+    }
+  }
+
+  .paddingTop40px {
+    padding-top: 10px;
+  }
 }
 
 @media only screen and (min-width: 1200px) {
   #app #textareaOut {
     height: 100% !important;
   }
-}
-
-#app .noWrap textarea {
-  white-space: pre;
-}
-
-#app #upload .el-upload.el-upload--text.is-drag {
-  height: 100%;
-}
-
-#app #upload .el-upload-dragger {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-}
-
-#app #upload.pointer-events-none {
-  pointer-events: none;
-}
-
-#app #tableOut table tbody tr td .cell {
-  white-space: pre-line;
-}
-
-#app #divFuzzySearch .tools {
-  padding: 0 10px;
-}
-
-#app #divFuzzySearch .tools:first-child {
-  border-right: 0px;
-}
-
-#app #divFuzzySearch .tools:last-child {
-  border-left: 0px;
-}
-
-#app #divFuzzySearch .tools .el-checkbox__label {
-  padding: 0;
-}
-
-#app .paddingTop40px {
-  padding-top: 10px;
 }
 
 @media only screen and (min-width: 1200px) {
@@ -859,6 +865,7 @@ const logFilterWithRegex = (): void => {
         isResultTooBig.value = true;
       } else {
         isResultTooBig.value = false;
+        debugger
         switch (reader.value) {
           case "Markdown":
             markdownOut.value = arrayTempResult.join("\n");
@@ -1226,11 +1233,15 @@ const calculateUpload: _.DebouncedFunc<any> = _.debounce((uploadFiles: UploadFil
 const calculateUploadComplete: _.DebouncedFunc<any> = _.debounce((): void => {
   isTextareaInOrTimeChange = true;
   mappingData();
+  debugger
   isUploadLoading.value = false;
 }, 1000); // 上传文件完成
 
 // _.chain(_.countBy(arrayFileIn.map(m => arrayFileIn.map(m => m.substring(25, 10))).filter(f => f != undefined))).map(function (cnt, brand) {
 //   return {brand: brand, count: cnt};
 // }).sortBy("count").reverse().value();
+
+// 时间差
+// arrayTempResult.forEach((e)=>{console.log(moment(e.match(new RegExp(/\[Start:.*?\]/g))[0].slice(7,30))-moment(e.match(new RegExp(/\[End:.*?\]/g))[0].slice(5,28)));console.log(e.match(new RegExp(/\[Start:.*?\]/g))[0].slice(7,30))})
 </script>
 

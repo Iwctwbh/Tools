@@ -1,4 +1,7 @@
 <template>
+  <!--  <keep-alive>-->
+  <!--    <router-view></router-view>-->
+  <!--  </keep-alive>-->
   <router-view></router-view>
 
   <el-row style="justify-content: center;">

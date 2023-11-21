@@ -1,7 +1,7 @@
 {
   "name": "Tools",
   "private": true,
-  "version": "0.20231030.15",
+  "version": "0.20231121.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -32,6 +32,7 @@
     "moment-timezone": "^0.5.43",
     "npm-check": "^6.0.1",
     "pako": "^2.1.0",
+    "scss": "^0.2.4",
     "vkbeautify": "^0.99.3",
     "vue": "^3.3.6",
     "vue-router": "^4.2.5",

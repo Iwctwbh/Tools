@@ -13,8 +13,31 @@
           type="textarea"
         />
       </div>
+      <el-upload
+        v-model:file-list="fileList"
+        class="upload"
+        multiple
+        :on-preview="uploadPreview"
+        :on-change="uploadChange"
+        :on-remove="uploadRemove"
+        :auto-upload="false"
+        :disabled="false"
+        accept=".txt, .log"
+        style="padding-top: 10px;"
+      >
+        <el-button
+          :loading="isUploadLoading"
+        >
+          Upload
+        </el-button>
+        <template #tip>
+          <div class="el-upload__tip">
+            <!--              jpg/png files with a size less than 500KB.-->
+          </div>
+        </template>
+      </el-upload>
     </el-col>
-    <el-col :lg="5" style="margin: 0 auto; padding: 10px 0;">
+    <el-col :lg="5" style="margin: 0 auto; padding: 10px 0; text-align: center;">
       <el-radio-group v-model="module">
         <el-radio-button label="单模块">单模块</el-radio-button>
         <el-radio-button label="多模块">多模块</el-radio-button>
@@ -35,10 +58,11 @@
               </el-form-item>
 
               <el-form-item label="Key">
-                <el-input
-                  v-model="crypto_key"
+                <multi-mode-input
                   placeholder="Key"
-                ></el-input>
+                  v-model="crypto_key"
+                >
+                </multi-mode-input>
               </el-form-item>
 
               <el-form-item label="编码类型">
@@ -139,7 +163,7 @@
         <div style="align-self: center;">
           <el-button
             type="primary"
-            @click="Encrypt()"
+            @click="CryptoForBtn('Encrypt')"
           >
             加密 >>>
           </el-button>
@@ -147,9 +171,9 @@
         <div style="align-self: center;">
           <el-button
             type="primary"
-            @click="Decrypt()"
+            @click="CryptoForBtn('Decrypt')"
           >
-            &lt;&lt;&lt; 解密
+            解密 >>>
           </el-button>
         </div>
       </div>
@@ -162,29 +186,9 @@
         placeholder="Please input text"
         type="textarea"
       />
-      <el-upload
-        v-model:file-list="fileList"
-        class="upload"
-        multiple
-        :on-preview="uploadPreview"
-        :on-change="uploadChange"
-        :on-remove="uploadRemove"
-        :auto-upload="false"
-        :disabled="false"
-        accept=".txt, .log"
-        style="padding-top: 10px;"
-      >
-        <el-button
-          :loading="isUploadLoading"
-        >
-          Upload
-        </el-button>
-        <template #tip>
-          <div class="el-upload__tip">
-            <!--              jpg/png files with a size less than 500KB.-->
-          </div>
-        </template>
-      </el-upload>
+      <p style="width: 100%;">
+        用时：{{ timeSpend }}
+      </p>
     </el-col>
   </el-row>
 
@@ -201,6 +205,10 @@
 :deep(.el-tree) {
   width: 100%;
 }
+
+:deep(.el-select) {
+  width: 100%;
+}
 </style>
 
 <script lang='ts' setup>
@@ -214,7 +222,10 @@ import {kOptions, kEncodings, kModes, kPaddings} from "../constants/crypto_const
 import {Plug, CommonObject} from "../types/custom_types";
 import draggable from "vuedraggable";
 import type {ReplaceElement, ReplaceObject} from "replace_types";
-import {UploadUserFile} from "element-plus";
+import {UploadFile, UploadFiles, UploadProps, UploadUserFile} from "element-plus";
+import _ from "lodash";
+import moment from "moment";
+import MultiModeInput from "../component/multi-mode-input.vue";
 
 // Init
 let sloth: any = {}; // 是否使用命名空间？
@@ -230,6 +241,8 @@ const crypto_plug = ref<string>("");
 const {copy} = useClipboard();
 const module = ref<string>("单模块");
 const fileList = ref<UploadUserFile[]>([]);
+const timeSpend = ref<string>("");
+const isUploadLoading = ref<boolean>(false);
 
 type PlugElement = { plug: string | Ref<string>, remove_able?: boolean };
 
@@ -240,19 +253,19 @@ const state = reactive<PlugElement[]>(
   ],
 );
 
-let object: CryptoObject = {
-  Type: Plug.kCrypto,
-  Option: crypto_option.value,
-  Key: crypto_key.value,
-  Encoding: crypto_encoding.value,
-  Mode: crypto_mode.value,
-  Padding: crypto_padding.value,
-  Iv: crypto_iv.value
-};
-let json_string: string = JSON.stringify(object);
-crypto_plug.value = ZipString(json_string);
+// let object: CryptoObject = {
+//   Type: Plug.kCrypto,
+//   Option: crypto_option.value,
+//   Key: crypto_key.value,
+//   Encoding: crypto_encoding.value,
+//   Mode: crypto_mode.value,
+//   Padding: crypto_padding.value,
+//   Iv: crypto_iv.value
+// };
+// let json_string: string = JSON.stringify(object);
+// crypto_plug.value = ZipString(json_string);
 
-watch([crypto_option, crypto_key, crypto_encoding, crypto_mode, crypto_padding, crypto_iv], () => {
+watch([crypto_option, crypto_key.value, crypto_encoding, crypto_mode, crypto_padding, crypto_iv], (): void => {
   let object: CryptoObject = {
     Type: Plug.kCrypto,
     Option: crypto_option.value,
@@ -266,7 +279,7 @@ watch([crypto_option, crypto_key, crypto_encoding, crypto_mode, crypto_padding, 
   crypto_plug.value = ZipString(json_string);
 });
 
-watch(crypto_plug, () => {
+watch(crypto_plug, (): void => {
   try {
     let result: string = UnZipString(crypto_plug.value);
     let object: CryptoObject = JSON.parse(result);
@@ -281,9 +294,31 @@ watch(crypto_plug, () => {
 });
 
 // Function
+// 过滤按钮事件
+const CryptoForBtn = ref((argAction: string): void => {
+  console.log(crypto_key.value);
+  let dateTime: Date = new Date();
+  new Promise<void>((resolve) => {
+    setTimeout(() => {
+      dateTime = new Date();
+      resolve();
+    }, 50);
+  }).then(() => {
+    switch (argAction) {
+      case "Encrypt":
+        Encrypt();
+        break;
+      case "Decrypt":
+        Decrypt();
+        break;
+    }
+    timeSpend.value = moment((new Date().getTime() - dateTime.getTime())).format("mm:ss:SSS");
+  });
+}); // 过滤按钮事件
+
 const Encrypt = (): void => {
   try {
-    textareaOut.value = kOptions.find(item => item.value === crypto_option.value)!.Cipher.encrypt(textareaIn.value, kEncodings.find(item => item.value === crypto_encoding.value)!.enc.parse(crypto_key.value), {
+    kOptions.find(item => item.value === crypto_option.value)!.Cipher.encrypt(textareaIn.value, kEncodings.find(item => item.value === crypto_encoding.value)!.enc.parse(crypto_key.value), {
       mode: kModes.find(item => item.value === crypto_mode.value)!.mode,
       padding: kPaddings.find(item => item.value === crypto_padding.value)!.padding,
       iv: crypto_iv.value
@@ -296,7 +331,7 @@ const Encrypt = (): void => {
 const Decrypt = (): void => {
   try {
     if (module.value === "多模块") {
-      let result: string = textareaOut.value;
+      let result: string = textareaIn.value;
       state.forEach((o) => {
         let object: CommonObject = JSON.parse(UnZipString(o.plug));
         switch (object.Type) {
@@ -325,10 +360,9 @@ const Decrypt = (): void => {
             break;
         }
       });
-      //textareaIn.value = result;
-      console.log("success");
+      textareaOut.value = result;
     } else {
-      textareaIn.value = textareaOut.value.split("\n").map(s =>
+      textareaOut.value = textareaIn.value.split("\n").map(s =>
         kOptions.find(item => item.value === crypto_option.value)!.Cipher.decrypt(s, kEncodings.find(item => item.value === crypto_encoding.value)!.enc.parse(crypto_key.value), {
           mode: kModes.find(item => item.value == crypto_mode.value)?.mode,
           padding: kPaddings.find(item => item.value == crypto_padding.value)?.padding,
@@ -337,13 +371,13 @@ const Decrypt = (): void => {
       ).join("\n");
     }
   } catch (e) {
-    textareaIn.value = (e as Error).message;
+    textareaOut.value = (e as Error).message;
   }
 };
 
 const RemoveAt = (index: number): void => {
   state.splice(index, 1);
-  if (state.length == 0) {
+  if (state.length === 0) {
     state.push({plug: "", remove_able: true});
   }
 };
@@ -351,4 +385,51 @@ const RemoveAt = (index: number): void => {
 const Add = (index: number): void => {
   state.splice(index + 1, 0, {plug: "", remove_able: true});
 };
+
+// 预览文件
+const uploadPreview: UploadProps["onPreview"] = (uploadFile) => {
+}; // 预览文件
+
+// 移除文件
+const uploadRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
+}; // 移除文件
+
+// 上传文件
+const uploadChange: UploadProps["onChange"] = (file, uploadFiles) => {
+  isUploadLoading.value = true;
+  calculateUpload(uploadFiles);
+}; // 上传文件
+
+// 根据排序同步获取文件内容
+const getFileText = async (uploadFiles: UploadFiles) => {
+  for (let i in uploadFiles) {
+    let f: UploadFile = uploadFiles[i];
+    await f.raw?.text().then((res) => {
+      textareaIn.value = res;
+      // res.split("\n").filter(f => f !== "").forEach((v) => {
+      //   textareaOut.value += v + "\n";
+      // });
+    });
+  }
+}; // 根据排序同步获取文件内容
+
+// 上传文件
+const calculateUpload: _.DebouncedFunc<any> = _.debounce((uploadFiles: UploadFiles): void => {
+  textareaIn.value = "";
+
+  if (uploadFiles.length === 0) {
+
+  } else {
+    uploadFiles = _.sortBy(uploadFiles, (s: UploadFile) => s.name);
+    fileList.value = uploadFiles;
+    getFileText(uploadFiles).then(() => {
+      calculateUploadComplete();
+    });
+  }
+}, 1000); // 上传文件
+
+// 上传文件完成
+const calculateUploadComplete: _.DebouncedFunc<any> = _.debounce((): void => {
+  isUploadLoading.value = false;
+}, 1000); // 上传文件完成
 </script>

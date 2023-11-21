@@ -16,7 +16,7 @@
     </el-col>
     <el-col :lg="5" style="margin: 0 auto; text-align: center;">
       <el-space direction="vertical">
-        <custom-draggable ref="custom_draggable" @watch="WatchState" />
+        <replace-draggable ref="custom_draggable" @watch="WatchState" />
 
         <div style="display: flex; align-items: center;">
           插件
@@ -50,7 +50,8 @@
 <script lang='ts' setup>
 // Import
 import {ref, watch} from "vue";
-import CustomDraggable from "../component/replace-draggable.vue";
+// import CustomDraggable from "../component/draggable-form.vue";
+import ReplaceDraggable from "../component/replace-draggable.vue";
 import {useClipboard} from "@vueuse/core";
 import {ZipString, UnZipString} from "../utils/pako";
 import {Plug} from "../types/custom_types";

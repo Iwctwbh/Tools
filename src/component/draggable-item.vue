@@ -17,14 +17,14 @@
           >
             <CirclePlus />
           </el-icon>
-          <MultiModeInput
+          <el-input
             placeholder="替换前的字符"
             v-model="element.find"
           />
           <el-icon>
             <Right />
           </el-icon>
-          <MultiModeInput
+          <el-input
             placeholder="替换后的字符"
             v-model="element.replace"
           />
@@ -51,7 +51,6 @@
 import {reactive, UnwrapRef, watch} from "vue";
 import draggable from "vuedraggable"; // https://github.com/SortableJS/vue.draggable.next
 import type {ReplaceElement} from "replace_types";
-import MultiModeInput from "./multi-mode-input.vue";
 
 const emit = defineEmits(["watch"]);
 const state = reactive<ReplaceElement[]>(

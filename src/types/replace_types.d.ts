@@ -1,5 +1,5 @@
 declare module "replace_types" {
-  import {Plug, CommonObject} from "./custom_types";
+  import {CommonObject} from "./custom_types";
 
   type ReplaceElement = { find: string, replace: string, regex: boolean };
 
