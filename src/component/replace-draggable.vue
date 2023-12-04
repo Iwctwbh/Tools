@@ -26,7 +26,7 @@
           </el-icon>
           <MultiModeInput
             placeholder="替换后的字符"
-            v-model="element.replace"
+            v-model:input = "element.replace"
           />
           <el-checkbox
             v-model="element.regex"
@@ -69,7 +69,7 @@ watch(state, () => {
 // Function
 const RemoveAt = (index: number): void => {
   state.splice(index, 1);
-  if (state.length == 0) {
+  if (state.length === 0) {
     state.push({find: "", replace: "", regex: false});
   }
 };
@@ -80,13 +80,8 @@ const Add = (index: number): void => {
 
 const Calculate = (argValue: UnwrapRef<string>): string => {
   return argValue.split("\n").map(m =>
-    state.map((item: ReplaceElement) => {
-        if (item.regex) {
-          return m = m.replaceAll(new RegExp(item.find, "g"), m.match(new RegExp(item.replace, "g"))?.join("") || "");
-        } else {
-          return m = m.replaceAll(item.find, item.replace);
-        }
-      }
+    state.map((item: ReplaceElement) =>
+      item.regex ? m.replaceAll(new RegExp(item.find, "g"), m.match(new RegExp(item.replace, "g"))?.join("") || "") : m.replaceAll(item.find, item.replace)
     )[state.length - 1]
   ).join("\n");
 };

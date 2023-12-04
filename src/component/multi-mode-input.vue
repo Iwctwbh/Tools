@@ -1,6 +1,7 @@
 <template>
   <el-input
     v-model="input"
+    :value="input"
     :placeholder="placeholder"
   >
     <template #suffix>
@@ -16,7 +17,11 @@
             <setting />
           </el-icon>
         </template>
-        <draggable-form v-if="isShow"></draggable-form>
+        <draggable-form
+          v-if="isShow"
+          @watch="WatchState"
+        >
+        </draggable-form>
         <div style="text-align: right; margin: 0">
           <el-button size="small" text @click="visible = false">cancel</el-button>
           <el-button
@@ -32,7 +37,7 @@
   </el-input>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .click {
   cursor: pointer;
 }
@@ -41,6 +46,9 @@
 <script setup lang="ts">
 import {ref, defineAsyncComponent} from "vue";
 import {Setting} from "@element-plus/icons-vue";
+import {Plug} from "../types/custom_types";
+import {ZipString} from "../utils/pako";
+import type {PlugElement, PlugObject} from "plug_types";
 // import DraggableForm from "./draggable-form.vue";
 const DraggableForm = defineAsyncComponent(async () => await import("./draggable-form.vue"));
 
@@ -55,6 +63,15 @@ const Show = (): void => {
   visible.value = true;
 };
 
+const WatchState = (state: PlugElement[]): void => {
+  let object: PlugObject = {
+    Type: Plug.kReplace,
+    State: state
+  };
+  let json_string: string = JSON.stringify(object);
+  input.value = ZipString(json_string);
+};
+
 // Expose
-defineExpose({textValue: input});
+// defineExpose({textValue: input});
 </script>
