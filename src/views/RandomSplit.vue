@@ -33,7 +33,6 @@
           v-model="RandomTimes"
           min="1"
           size="large"
-          @change="inputDigitChange"
         />
 
         <br />
@@ -44,7 +43,6 @@
           v-model="DividedCount"
           min="1"
           size="large"
-          @change="inputDigitChange"
         />
 
         <br />
@@ -89,12 +87,12 @@ const textareaOut = ref<string>("");
 
 // Function
 const RandomSplit = () => {
-  let result = [];
+  let result:any[] = [];
   [...Array(RandomTimes.value)].forEach((f) => {
-    let arr = textareaIn.value.split("\n").map(m => m.trim());
-    let tempArr = [];
+    let arr: string[] = textareaIn.value.split("\n").map(m => m.trim());
+    let tempArr:string[] = [];
     [...Array(DividedCount.value)].forEach((f) => {
-      let r = Math.random() * arr.length;
+      let r: number = Math.random() * arr.length;
       tempArr.push(...arr.splice(r, 1));
     });
     result.push(tempArr);
@@ -103,6 +101,6 @@ const RandomSplit = () => {
 };
 
 const CreateExample = () => {
-  textareaIn.value = ['旺旺仙贝', '旺旺雪饼', 'ad钙奶', '米多奇 椒盐味', '小浣熊 紫色袋子的 意式红烩味', '趣多多 曲奇风味巧克力 最爱', '乐事薯片 青柠味 黄瓜味', '小卫龙', '洽洽瓜子 核桃味', '素毛肚', '好丽友派', '波力海苔', '旺旺小小酥 不是葱香味 原味', '星球杯', '小瓜子 椒盐味', '阿华田风味蛋糕卷', '贤哥小小脆', '呀土豆 番茄味', '喜之郎果冻', '奥利奥威化小饼干', '奥利奥香草慕斯卷', '香蕉片', '星星杯 巧克力味', '好多鱼 番茄味', '奥利奥浓郁巧克力味脆卷', '张君雅小妹妹 日式 和风', '闲趣小饼干', '王子饼干', '蛋酥卷', '妙芙 奶油味欧式蛋糕 经常吃'].join('\n');
+  textareaIn.value = ["旺旺仙贝", "旺旺雪饼", "ad钙奶", "米多奇 椒盐味", "小浣熊 紫色袋子的 意式红烩味", "趣多多 曲奇风味巧克力 最爱", "乐事薯片 青柠味 黄瓜味", "小卫龙", "洽洽瓜子 核桃味", "素毛肚", "好丽友派", "波力海苔", "旺旺小小酥 不是葱香味 原味", "星球杯", "小瓜子 椒盐味", "阿华田风味蛋糕卷", "贤哥小小脆", "呀土豆 番茄味", "喜之郎果冻", "奥利奥威化小饼干", "奥利奥香草慕斯卷", "香蕉片", "星星杯 巧克力味", "好多鱼 番茄味", "奥利奥浓郁巧克力味脆卷", "张君雅小妹妹 日式 和风", "闲趣小饼干", "王子饼干", "蛋酥卷", "妙芙 奶油味欧式蛋糕 经常吃"].join("\n");
 };
 </script>
